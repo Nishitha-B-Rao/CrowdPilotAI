@@ -40,7 +40,7 @@ These modules demonstrate the long-term vision, commercial viability, and UI/UX 
 ### B. Incident Copilot & Decision Timeline
 * **Location**: Sidebar -> Incident Copilot (`/incident-copilot`)
 * **Purpose**: A dedicated view for handling emergencies (Medical, Security). 
-* **How it works**: Upload `incidents.csv` to seamlessly pass real-time incident reports to Vertex AI, which assigns priorities, generates reasoning, and provides dispatch action scripts dynamically.
+* **How it works**: Upload any file from `mock_data/incidents_*.csv` to seamlessly pass real-time incident reports to Vertex AI, which assigns priorities, generates reasoning, and provides dispatch action scripts dynamically.
 
 ### C. Live Heatmap Analytics
 * **Location**: Main Dashboard & Analytics Page (`/analytics`)

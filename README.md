@@ -33,7 +33,7 @@ CrowdPilot AI utilizes a Clean Architecture pattern, decoupling the AI orchestra
 
 ## 🧠 AI Workflow
 
-1. **Ingestion**: Raw telemetry data (`crowd_data.csv`) and incident reports (`incidents.csv`) are uploaded to the FastAPI backend.
+1. **Ingestion**: Raw telemetry data (from `mock_data/crowd_*.csv`) and incident reports (`mock_data/incidents_*.csv`) are uploaded to the FastAPI backend.
 2. **State Processing**: The Data Processing Service sanitizes the input and updates the global `StadiumState`.
 3. **Vertex AI Inference**: The telemetry state is injected into a highly engineered prompt and sent to Gemini 2.5 Flash.
 4. **Structured Output**: The model returns a strict JSON schema containing the AI's reasoning, confidence, and action plan.
@@ -60,8 +60,12 @@ CrowdPilotAI/
 │   │   ├── components/    # Reusable React components (Sidebar, CsvUploader)
 │   │   └── globals.css    # Tailwind & Glassmorphism styles
 │   └── Dockerfile         # Frontend containerization
-├── crowd_data.csv         # Demo dataset for live telemetry
-└── incidents.csv          # Demo dataset for Incident Copilot
+├── mock_data/             # Scenario-based datasets for demo
+│   ├── crowd_01_normal.csv
+│   ├── crowd_02_halftime_surge.csv
+│   ├── crowd_03_postmatch_exit.csv
+│   ├── incidents_01_minor.csv
+│   └── incidents_02_severe.csv
 ```
 
 ---

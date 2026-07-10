@@ -1,0 +1,4 @@
+time,type,gate,severity,description
+10:05,Lost Item,C,Low,Fan lost wallet near concessions
+10:11,Lost Child,B,Medium,Child separated from parents at gate
+10:15,Medical,D,Low,Minor scrape on knee

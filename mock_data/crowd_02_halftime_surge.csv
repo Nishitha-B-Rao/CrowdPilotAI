@@ -1,0 +1,5 @@
+gate_id,occupancy,queue_time,inflow,outflow
+A,85,15,450,100
+B,95,22,600,120
+C,72,12,310,150
+D,45,5,150,80

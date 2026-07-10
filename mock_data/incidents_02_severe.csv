@@ -1,0 +1,4 @@
+time,type,gate,severity,description
+20:45,Medical,C,Critical,Multiple fans fainted due to heat exhaustion in section 112
+20:50,Security,B,Critical,Aggressive altercation between rival fan groups blocking exits
+20:55,Structural,A,High,Turnstile 4 is jammed causing massive bottleneck
