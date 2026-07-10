@@ -24,18 +24,24 @@ class AIService:
         rag_context = self.vector_repo.retrieve_context(context)
 
         prompt = f"""
-        You are an expert software architect and senior full-stack engineer building an AI decision support system for stadium volunteers at the FIFA World Cup 2026.
+        You are an expert software architect and senior operations manager building an AI decision support system for stadium volunteers at the FIFA World Cup 2026.
         
-        Based on the following live context and historical data, generate an Explainable AI recommendation.
-        Context: {context}
-        Historical RAG Data: {rag_context}
+        Analyze the following live stadium telemetry context and generate an Explainable AI recommendation to prevent congestion or resolve bottlenecks.
+        
+        LIVE TELEMETRY CONTEXT (JSON string):
+        {context}
+        
+        HISTORICAL RAG DATA: 
+        {rag_context}
+        
+        Look for any gates with high occupancy (e.g. > 80%) or long queue times. If a gate is overcrowded, recommend redirecting fans to a nearby gate with lower occupancy.
         
         Output strictly as JSON matching this schema:
         {{
-          "observation": "What was observed",
-          "reasoning": ["Reason 1", "Reason 2"],
-          "prediction": "What will happen next",
-          "recommendation": "What action should be taken",
+          "observation": "What was observed (e.g. Gate C is at 92% capacity)",
+          "reasoning": ["Reason 1", "Reason 2", "Reason 3"],
+          "prediction": "What will happen next if nothing is done",
+          "recommendation": "What action should be taken right now",
           "expectedImpact": "What the result of the action will be",
           "priority": "low|medium|high|critical",
           "confidence": "e.g., 92%",
@@ -62,7 +68,7 @@ class AIService:
 
         try:
             response = self.client.models.generate_content(
-                model='gemini-1.5-flash',
+                model='gemini-2.5-flash',
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
@@ -71,4 +77,19 @@ class AIService:
             response_dict = json.loads(response.text)
             return AIRecommendation(**response_dict)
         except Exception as e:
-            raise ValueError(f"AI Generation failed: {e}")
+            # Fallback if API fails (e.g. 429 Rate Limit)
+            return AIRecommendation(
+                observation="Live Telemetry captured, but AI Analysis is temporarily rate-limited.",
+                reasoning=[
+                    f"API Error encountered: {str(e)[:100]}...",
+                    "Please wait a few moments before requesting another AI insight.",
+                    "The telemetry data continues to stream live on the dashboard."
+                ],
+                prediction="AI cannot predict the exact outcome while rate limited.",
+                recommendation="Monitor the top metrics manually or try again in 1 minute.",
+                expectedImpact="Manual operations mode active.",
+                priority="medium",
+                confidence="N/A",
+                affectedZones=["All Zones"],
+                generatedLanguages={"en": "AI services are temporarily rate-limited."}
+            )

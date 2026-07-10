@@ -17,30 +17,59 @@ type Recommendation = {
   affectedZones: string[];
 };
 
+type Gate = {
+  id: string;
+  name: string;
+  occupancy_percentage: number;
+  queue_time_minutes: number;
+};
+
+type StadiumState = {
+  total_occupancy: number;
+  active_incidents: number;
+  avg_queue_time: number;
+  gates: Gate[];
+};
+
 export default function Dashboard() {
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [stadiumState, setStadiumState] = useState<StadiumState | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  // Mock data for demo purposes before backend is connected
   useEffect(() => {
-    setRecommendations([
-      {
-        id: "rec-1",
-        timestamp: new Date().toLocaleTimeString(),
-        observation: "Gate C occupancy reached 84%.",
-        reasoning: [
-          "Recent metro arrival increased incoming fans.",
-          "Security screening speed decreased by 15% due to staff shortage.",
-          "Historical matches with similar traffic caused congestion bottlenecks."
-        ],
-        prediction: "Gate C will exceed safe capacity (100%) within 7 minutes.",
-        recommendation: "Redirect incoming fans from South Transit Hub to Gate D.",
-        expectedImpact: "Average wait time decreases from 18 minutes to 6 minutes. Prevents crush risk.",
-        priority: "critical",
-        confidence: "92%",
-        affectedZones: ["Gate C", "Gate D", "South Transit Hub"]
+    const fetchData = async () => {
+      try {
+        // Fetch live telemetry state
+        const telemetryRes = await fetch("http://localhost:8000/api/v1/telemetry/state");
+        if (!telemetryRes.ok) throw new Error("Failed to fetch telemetry");
+        const state: StadiumState = await telemetryRes.json();
+        setStadiumState(state);
+
+        // Fetch AI recommendation based on this context
+        const copilotRes = await fetch("http://localhost:8000/api/v1/copilot/recommendation", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ context: JSON.stringify(state) })
+        });
+        if (!copilotRes.ok) throw new Error("Failed to fetch recommendation");
+        const recommendation: Omit<Recommendation, "id" | "timestamp"> = await copilotRes.json();
+        
+        // Update recommendations list (keeping only the latest one for demo purposes)
+        setRecommendations([{
+          ...recommendation,
+          id: `rec-${Date.now()}`,
+          timestamp: new Date().toLocaleTimeString(),
+        }]);
+        
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
-    ]);
+    };
+
+    fetchData();
+    // Poll every 30 seconds to avoid hitting free-tier API rate limits
+    const interval = setInterval(fetchData, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const getPriorityStyle = (priority: string) => {
@@ -57,10 +86,10 @@ export default function Dashboard() {
       {/* Top Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {[
-          { label: "Total Occupancy", value: "68,402", icon: Users, color: "from-cyan-400 to-blue-500", shadow: "shadow-cyan-500/20" },
-          { label: "Active Incidents", value: "3", icon: AlertTriangle, color: "from-orange-400 to-red-500", shadow: "shadow-orange-500/20" },
-          { label: "Avg Queue Time", value: "12m", icon: Activity, color: "from-indigo-400 to-purple-500", shadow: "shadow-indigo-500/20" },
-          { label: "AI Decisions", value: "14", icon: CheckCircle2, color: "from-emerald-400 to-teal-500", shadow: "shadow-emerald-500/20" },
+          { label: "Total Occupancy", value: stadiumState ? stadiumState.total_occupancy.toLocaleString() : "...", icon: Users, color: "from-cyan-400 to-blue-500", shadow: "shadow-cyan-500/20" },
+          { label: "Active Incidents", value: stadiumState ? stadiumState.active_incidents.toString() : "...", icon: AlertTriangle, color: "from-orange-400 to-red-500", shadow: "shadow-orange-500/20" },
+          { label: "Avg Queue Time", value: stadiumState ? `${stadiumState.avg_queue_time}m` : "...", icon: Activity, color: "from-indigo-400 to-purple-500", shadow: "shadow-indigo-500/20" },
+          { label: "AI Decisions", value: recommendations.length.toString(), icon: CheckCircle2, color: "from-emerald-400 to-teal-500", shadow: "shadow-emerald-500/20" },
         ].map((stat, i) => (
           <motion.div 
             key={i} 

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.v1.endpoints import copilot
+from app.api.v1.endpoints import copilot, telemetry
 from app.core.config import settings
 
 app = FastAPI(
@@ -19,6 +19,7 @@ app.add_middleware(
 )
 
 app.include_router(copilot.router, prefix=f"{settings.API_V1_STR}/copilot", tags=["copilot"])
+app.include_router(telemetry.router, prefix=f"{settings.API_V1_STR}/telemetry", tags=["telemetry"])
 
 
 @app.get("/")
