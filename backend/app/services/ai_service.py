@@ -1,7 +1,8 @@
 import json
 from typing import Optional
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 from app.core.config import settings
 from app.models.schemas import AIRecommendation
@@ -12,12 +13,9 @@ class AIService:
     def __init__(self, vector_repo: VectorRepository):
         self.vector_repo = vector_repo
         if settings.GEMINI_API_KEY:
-            genai.configure(api_key=settings.GEMINI_API_KEY)
-            self.model = genai.GenerativeModel(
-                "gemini-1.5-flash", generation_config={"response_mime_type": "application/json"}
-            )
+            self.client = genai.Client(api_key=settings.GEMINI_API_KEY)
         else:
-            self.model = None
+            self.client = None
 
     def generate_recommendation(self, context: str) -> AIRecommendation:
         """
@@ -48,7 +46,7 @@ class AIService:
         }}
         """
 
-        if not self.model:
+        if not self.client:
             # Return fallback for testing without API Key
             return AIRecommendation(
                 observation="Context matched: " + context,
@@ -63,7 +61,13 @@ class AIService:
             )
 
         try:
-            response = self.model.generate_content(prompt)
+            response = self.client.models.generate_content(
+                model='gemini-1.5-flash',
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                ),
+            )
             response_dict = json.loads(response.text)
             return AIRecommendation(**response_dict)
         except Exception as e:

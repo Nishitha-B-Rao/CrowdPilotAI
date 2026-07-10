@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Activity, AlertTriangle, ArrowRight, CheckCircle2, ChevronDown, ChevronUp, Users, Mic } from "lucide-react";
+import { Activity, AlertTriangle, ArrowRight, CheckCircle2, ChevronDown, ChevronUp, Users, Mic, Radio } from "lucide-react";
 
 type Recommendation = {
   id: string;
@@ -36,95 +36,114 @@ export default function Dashboard() {
         prediction: "Gate C will exceed safe capacity (100%) within 7 minutes.",
         recommendation: "Redirect incoming fans from South Transit Hub to Gate D.",
         expectedImpact: "Average wait time decreases from 18 minutes to 6 minutes. Prevents crush risk.",
-        priority: "high",
+        priority: "critical",
         confidence: "92%",
         affectedZones: ["Gate C", "Gate D", "South Transit Hub"]
       }
     ]);
   }, []);
 
-  const getPriorityColor = (priority: string) => {
+  const getPriorityStyle = (priority: string) => {
     switch (priority) {
-      case "critical": return "text-red-500 bg-red-500/10 border-red-500/20";
-      case "high": return "text-orange-500 bg-orange-500/10 border-orange-500/20";
-      case "medium": return "text-yellow-500 bg-yellow-500/10 border-yellow-500/20";
-      default: return "text-blue-500 bg-blue-500/10 border-blue-500/20";
+      case "critical": return "text-red-400 bg-red-500/10 border-red-500/30 shadow-[0_0_10px_rgba(239,68,68,0.2)]";
+      case "high": return "text-orange-400 bg-orange-500/10 border-orange-500/30 shadow-[0_0_10px_rgba(249,115,22,0.2)]";
+      case "medium": return "text-yellow-400 bg-yellow-500/10 border-yellow-500/30 shadow-[0_0_10px_rgba(234,179,8,0.2)]";
+      default: return "text-cyan-400 bg-cyan-500/10 border-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.2)]";
     }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Top Metrics Row */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {[
-          { label: "Total Stadium Occupancy", value: "68,402", icon: Users },
-          { label: "Active Incidents", value: "3", icon: AlertTriangle, color: "text-orange-500" },
-          { label: "Avg Queue Time", value: "12m", icon: Activity },
-          { label: "AI Recommendations", value: "14", icon: CheckCircle2, color: "text-emerald-500" },
+          { label: "Total Occupancy", value: "68,402", icon: Users, color: "from-cyan-400 to-blue-500", shadow: "shadow-cyan-500/20" },
+          { label: "Active Incidents", value: "3", icon: AlertTriangle, color: "from-orange-400 to-red-500", shadow: "shadow-orange-500/20" },
+          { label: "Avg Queue Time", value: "12m", icon: Activity, color: "from-indigo-400 to-purple-500", shadow: "shadow-indigo-500/20" },
+          { label: "AI Decisions", value: "14", icon: CheckCircle2, color: "from-emerald-400 to-teal-500", shadow: "shadow-emerald-500/20" },
         ].map((stat, i) => (
-          <div key={i} className="bg-card border border-border rounded-xl p-4 flex items-center justify-between shadow-sm">
-            <div>
-              <p className="text-xs text-muted-foreground font-medium mb-1">{stat.label}</p>
-              <h3 className="text-2xl font-bold">{stat.value}</h3>
+          <motion.div 
+            key={i} 
+            whileHover={{ y: -5, scale: 1.02 }}
+            className="glass rounded-2xl p-5 flex items-center justify-between group overflow-hidden relative"
+          >
+            {/* Hover subtle glow */}
+            <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
+            
+            <div className="relative z-10">
+              <p className="text-xs text-muted-foreground uppercase tracking-widest font-semibold mb-2">{stat.label}</p>
+              <h3 className="text-3xl font-bold text-white tracking-tight">{stat.value}</h3>
             </div>
-            <div className={`p-3 bg-secondary rounded-lg ${stat.color || "text-primary"}`}>
-              <stat.icon size={20} />
+            
+            <div className={`relative p-3 rounded-xl bg-gradient-to-br ${stat.color} ${stat.shadow} shadow-lg`}>
+              <stat.icon size={24} className="text-white" />
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
 
       {/* Main Content Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-220px)]">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Left Column: Decision Timeline */}
-        <div className="lg:col-span-2 flex flex-col space-y-4">
+        <div className="lg:col-span-2 flex flex-col space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold tracking-tight">AI Decision Timeline</h2>
-            <div className="flex items-center space-x-2 text-sm text-muted-foreground bg-secondary px-3 py-1 rounded-full">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span>Live Analysis</span>
+            <h2 className="text-xl font-bold tracking-tight text-white flex items-center">
+              <Radio size={20} className="mr-3 text-cyan-400" />
+              AI Decision Timeline
+            </h2>
+            <div className="flex items-center space-x-2 text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>LIVE RAG STREAM</span>
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto pr-2 space-y-4">
+          <div className="flex-1 space-y-6">
             <AnimatePresence>
               {recommendations.map((rec) => (
                 <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
                   key={rec.id}
-                  className="bg-card border border-border rounded-xl shadow-sm overflow-hidden"
+                  className="glass rounded-2xl overflow-hidden relative"
                 >
+                  {/* Subtle top border gradient */}
+                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-50"></div>
+                  
                   {/* Card Header (Summary) */}
-                  <div className="p-5">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center space-x-3">
-                        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${getPriorityColor(rec.priority)} uppercase tracking-wider`}>
-                          {rec.priority} PRIORITY
+                  <div className="p-6">
+                    <div className="flex items-start justify-between mb-5">
+                      <div className="flex items-center space-x-4">
+                        <span className={`text-xs font-bold px-3 py-1 rounded-full border ${getPriorityStyle(rec.priority)} uppercase tracking-wider`}>
+                          {rec.priority} Priority
                         </span>
-                        <span className="text-sm text-muted-foreground">{rec.timestamp}</span>
+                        <span className="text-sm font-medium text-muted-foreground">{rec.timestamp}</span>
                       </div>
-                      <div className="text-sm font-medium text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-md border border-emerald-500/20">
+                      <div className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
                         {rec.confidence} Confidence
                       </div>
                     </div>
 
-                    <h3 className="text-lg font-bold mb-2">Recommendation: {rec.recommendation}</h3>
-                    <p className="text-muted-foreground text-sm flex items-center">
-                      <ArrowRight size={16} className="mr-2 text-primary" />
+                    <h3 className="text-xl font-bold text-white mb-3 tracking-tight leading-snug">
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-white/70">
+                        {rec.recommendation}
+                      </span>
+                    </h3>
+                    
+                    <p className="text-emerald-400/90 text-sm flex items-center font-medium bg-emerald-500/5 p-3 rounded-lg border border-emerald-500/10">
+                      <CheckCircle2 size={18} className="mr-3" />
                       {rec.expectedImpact}
                     </p>
 
                     {/* Expand Toggle */}
                     <button 
                       onClick={() => setExpandedId(expandedId === rec.id ? null : rec.id)}
-                      className="mt-4 flex items-center text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+                      className="mt-6 flex items-center text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition-colors group bg-cyan-500/10 px-4 py-2 rounded-full border border-cyan-500/20"
                     >
                       {expandedId === rec.id ? (
-                        <><ChevronUp size={16} className="mr-1" /> Hide Reasoning</>
+                        <><ChevronUp size={16} className="mr-2 group-hover:-translate-y-1 transition-transform" /> Hide XAI Pipeline</>
                       ) : (
-                        <><ChevronDown size={16} className="mr-1" /> Why this recommendation?</>
+                        <><ChevronDown size={16} className="mr-2 group-hover:translate-y-1 transition-transform" /> View XAI Reasoning</>
                       )}
                     </button>
                   </div>
@@ -136,42 +155,53 @@ export default function Dashboard() {
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        className="border-t border-border bg-secondary/30"
+                        className="bg-black/20 backdrop-blur-sm border-t border-white/5"
                       >
-                        <div className="p-5 space-y-6">
+                        <div className="p-6 space-y-8">
                           {/* XAI Flow Pipeline */}
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm relative">
-                            {/* Connector Line */}
-                            <div className="absolute top-1/2 left-0 w-full h-[1px] bg-border hidden md:block -z-10"></div>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm relative">
+                            {/* Glowing Connector Line */}
+                            <div className="absolute top-[28px] left-1/6 right-1/6 w-2/3 h-0.5 bg-gradient-to-r from-cyan-500/50 via-indigo-500/50 to-orange-500/50 hidden md:block -z-10 shadow-[0_0_8px_rgba(6,182,212,0.5)]"></div>
                             
-                            <div className="bg-card p-4 rounded-lg border border-border shadow-sm">
-                              <div className="font-semibold text-primary mb-2 flex items-center">
-                                <Activity size={16} className="mr-2" /> 1. Observation
+                            {/* Observation Node */}
+                            <div className="glass-panel p-5 rounded-xl relative group hover:border-cyan-500/30 transition-colors">
+                              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.6)] border-2 border-background z-10 flex items-center justify-center hidden md:flex"></div>
+                              <div className="font-bold text-cyan-400 mb-3 flex items-center tracking-wide uppercase text-xs">
+                                <Activity size={14} className="mr-2" /> Observation
                               </div>
-                              <p className="text-muted-foreground">{rec.observation}</p>
+                              <p className="text-white/80 leading-relaxed">{rec.observation}</p>
                             </div>
                             
-                            <div className="bg-card p-4 rounded-lg border border-border shadow-sm">
-                              <div className="font-semibold text-blue-400 mb-2 flex items-center">
-                                <CheckCircle2 size={16} className="mr-2" /> 2. Reasoning
+                            {/* Reasoning Node */}
+                            <div className="glass-panel p-5 rounded-xl relative group hover:border-indigo-500/30 transition-colors">
+                              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.6)] border-2 border-background z-10 flex items-center justify-center hidden md:flex"></div>
+                              <div className="font-bold text-indigo-400 mb-3 flex items-center tracking-wide uppercase text-xs">
+                                <CheckCircle2 size={14} className="mr-2" /> Reasoning
                               </div>
-                              <ul className="list-disc pl-4 space-y-1 text-muted-foreground">
-                                {rec.reasoning.map((r, i) => <li key={i}>{r}</li>)}
+                              <ul className="space-y-2 text-white/80 list-none">
+                                {rec.reasoning.map((r, i) => (
+                                  <li key={i} className="flex items-start">
+                                    <span className="text-indigo-400 mr-2 mt-0.5">•</span>
+                                    <span>{r}</span>
+                                  </li>
+                                ))}
                               </ul>
                             </div>
                             
-                            <div className="bg-card p-4 rounded-lg border border-border shadow-sm border-l-4 border-l-orange-500">
-                              <div className="font-semibold text-orange-500 mb-2 flex items-center">
-                                <AlertTriangle size={16} className="mr-2" /> 3. Prediction
+                            {/* Prediction Node */}
+                            <div className="glass-panel p-5 rounded-xl relative group hover:border-orange-500/30 transition-colors">
+                              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.6)] border-2 border-background z-10 flex items-center justify-center hidden md:flex"></div>
+                              <div className="font-bold text-orange-400 mb-3 flex items-center tracking-wide uppercase text-xs">
+                                <AlertTriangle size={14} className="mr-2" /> Prediction
                               </div>
-                              <p className="text-muted-foreground">{rec.prediction}</p>
+                              <p className="text-white/80 leading-relaxed">{rec.prediction}</p>
                             </div>
                           </div>
                           
-                          <div className="flex flex-wrap gap-2">
-                            <span className="text-xs text-muted-foreground mr-2 py-1">Affected Zones:</span>
+                          <div className="flex flex-wrap gap-3 items-center bg-white/5 p-4 rounded-xl border border-white/5">
+                            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mr-2">Impacted Zones:</span>
                             {rec.affectedZones.map(z => (
-                              <span key={z} className="bg-secondary text-foreground text-xs px-2 py-1 rounded-md border border-border">{z}</span>
+                              <span key={z} className="bg-primary/20 text-primary text-xs font-bold px-3 py-1.5 rounded-lg border border-primary/30 shadow-[0_0_10px_rgba(99,102,241,0.2)]">{z}</span>
                             ))}
                           </div>
                         </div>
@@ -187,25 +217,52 @@ export default function Dashboard() {
         {/* Right Column: Map & Multilingual */}
         <div className="flex flex-col space-y-6">
           {/* Mock Stadium Map */}
-          <div className="bg-card border border-border rounded-xl p-4 shadow-sm flex-1 flex flex-col">
-            <h3 className="font-semibold mb-3">Live Heatmap</h3>
-            <div className="flex-1 bg-secondary rounded-lg border border-border flex items-center justify-center relative overflow-hidden">
-              <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at 20% 30%, #ef4444 0%, transparent 40%), radial-gradient(circle at 80% 70%, #f59e0b 0%, transparent 40%)' }}></div>
-              <p className="text-muted-foreground text-sm z-10 flex items-center"><Activity className="mr-2 animate-pulse" /> Stadium Map Visualization Loading...</p>
+          <div className="glass rounded-2xl p-6 flex-1 flex flex-col min-h-[350px]">
+            <h3 className="font-bold tracking-tight text-white mb-4 flex items-center">
+              <Activity size={18} className="mr-2 text-primary" /> Live Heatmap
+            </h3>
+            
+            {/* Animated Mesh Gradient Heatmap Mock */}
+            <div className="flex-1 rounded-xl border border-white/10 relative overflow-hidden group flex items-center justify-center bg-gray-900">
+              {/* Complex CSS animated background for heatmap feel */}
+              <div className="absolute inset-0 opacity-60 mix-blend-screen animate-slow-spin" 
+                   style={{ 
+                     backgroundImage: 'radial-gradient(circle at 50% 50%, #ef4444 0%, transparent 40%), radial-gradient(circle at 80% 20%, #f59e0b 0%, transparent 30%), radial-gradient(circle at 20% 80%, #3b82f6 0%, transparent 40%)',
+                     filter: 'blur(30px)',
+                     transform: 'scale(1.5)'
+                   }}>
+              </div>
+              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+              
+              <div className="z-10 bg-black/40 backdrop-blur-md px-4 py-2 rounded-lg border border-white/10 flex items-center text-sm font-medium text-white shadow-xl">
+                <div className="w-2 h-2 rounded-full bg-red-500 animate-ping mr-3"></div>
+                Rendering Spatial Data...
+              </div>
             </div>
           </div>
 
           {/* Multilingual Assistant */}
-          <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold">Multilingual Assistant</h3>
-              <span className="bg-blue-500/10 text-blue-500 text-xs px-2 py-1 rounded-full border border-blue-500/20">Auto-Detect</span>
+          <div className="glass rounded-2xl p-6 relative overflow-hidden">
+            {/* Ambient glow for microphone card */}
+            <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-cyan-500/20 blur-2xl rounded-full pointer-events-none"></div>
+            
+            <div className="flex items-center justify-between mb-5 relative z-10">
+              <h3 className="font-bold tracking-tight text-white flex items-center">
+                <Mic size={18} className="mr-2 text-cyan-400" /> Auto-Translate
+              </h3>
+              <span className="bg-cyan-500/10 text-cyan-400 text-xs font-bold px-3 py-1 rounded-full border border-cyan-500/30">Active</span>
             </div>
-            <div className="bg-secondary/50 rounded-lg p-4 mb-4 border border-border min-h-[100px] flex flex-col justify-center items-center text-center">
-              <p className="text-sm text-muted-foreground mb-2">Hold to translate fan requests</p>
-              <button className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-primary-foreground hover:scale-105 transition-transform shadow-lg shadow-primary/20">
-                <Mic size={20} />
-              </button>
+            
+            <div className="glass-panel rounded-xl p-6 border border-white/5 flex flex-col justify-center items-center text-center relative z-10 group">
+              <p className="text-sm font-medium text-white/70 mb-6">Hold to translate fan requests instantly</p>
+              
+              {/* Glowing Mic Button */}
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full blur-md opacity-50 group-hover:opacity-100 transition-opacity animate-pulse"></div>
+                <button className="relative w-16 h-16 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-white hover:scale-110 transition-all duration-300 shadow-[0_0_30px_rgba(6,182,212,0.5)] border border-white/20">
+                  <Mic size={24} />
+                </button>
+              </div>
             </div>
           </div>
         </div>

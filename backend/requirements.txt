@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+pydantic-settings
+google-genai
+pytest
+pytest-cov
+locust
+black
+flake8
+mypy
+isort
