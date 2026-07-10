@@ -31,16 +31,16 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="w-64 glass border-r-0 border-r-white/5 hidden md:flex flex-col m-4 mr-0 rounded-2xl relative overflow-hidden">
+    <aside className="w-full md:w-64 glass border-b md:border-b-0 md:border-r-0 border-white/5 flex flex-col md:m-4 md:mr-0 md:rounded-2xl relative shrink-0">
       <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none"></div>
       
-      <div className="p-6 relative">
+      <div className="p-4 md:p-6 relative hidden md:block">
         <h1 className="text-2xl font-bold tracking-tight text-gradient">CrowdPilot AI</h1>
         <p className="text-xs text-muted-foreground uppercase tracking-widest mt-1 font-semibold">Stadium Intel</p>
       </div>
       
-      <nav className="flex-1 overflow-y-auto py-4 relative z-10">
-        <ul className="space-y-2 px-4">
+      <nav className="flex-none md:flex-1 overflow-x-auto md:overflow-y-auto py-2 md:py-4 relative z-10 custom-scrollbar">
+        <ul className="flex flex-row md:flex-col space-x-2 md:space-x-0 md:space-y-2 px-2 md:px-4">
           <li>
             <Link href="/" className={getLinkClasses("/")}>
               <LayoutDashboard size={18} className={getIconClasses("/")} />

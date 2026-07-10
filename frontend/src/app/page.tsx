@@ -55,37 +55,36 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+        
         // Fetch live telemetry state
-        const telemetryRes = await fetch("http://localhost:8000/api/v1/telemetry/state");
+        const telemetryRes = await fetch(`${apiUrl}/api/v1/telemetry/state`);
         if (!telemetryRes.ok) throw new Error("Failed to fetch telemetry");
         const state: StadiumState = await telemetryRes.json();
         setStadiumState(state);
 
         // Fetch AI recommendation based on this context
-        const copilotRes = await fetch("http://localhost:8000/api/v1/copilot/recommendation", {
+        const copilotRes = await fetch(`${apiUrl}/api/v1/copilot/recommendation`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ context: JSON.stringify(state) })
         });
-        if (!copilotRes.ok) throw new Error("Failed to fetch recommendation");
-        const recommendation: Omit<Recommendation, "id" | "timestamp"> = await copilotRes.json();
         
-        // Update recommendations list (keeping only the latest one for demo purposes)
-        setRecommendations([{
-          ...recommendation,
-          id: `rec-${Date.now()}`,
-          timestamp: new Date().toLocaleTimeString(),
-        }]);
+        if (copilotRes.ok) {
+          const aiRec = await copilotRes.json();
+          setRecommendations(prev => [aiRec, ...prev.slice(0, 4)]);
+        }
         
         // Fetch AI Logs
-        const logsRes = await fetch("http://localhost:8000/api/v1/telemetry/ai-logs");
+        const logsRes = await fetch(`${apiUrl}/api/v1/telemetry/ai-logs`);
         if (logsRes.ok) {
           const logsData = await logsRes.json();
           setAiLogs(logsData.logs || []);
         }
-        
-      } catch (error) {
-        console.error("Error fetching data:", error);
+      } catch (err) {
+        console.error("Failed to fetch dashboard data:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -405,7 +404,8 @@ export default function Dashboard() {
                               setIsTranslating(true);
                               
                               try {
-                                const res = await fetch("http://localhost:8000/api/v1/copilot/translate", {
+                                const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+                                const res = await fetch(`${apiUrl}/api/v1/copilot/translate`, {
                                   method: "POST",
                                   headers: { "Content-Type": "application/json" },
                                   body: JSON.stringify({ text: transcript })
