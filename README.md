@@ -152,9 +152,9 @@ gcloud run deploy crowdpilot-frontend \
 
 ---
 
-## 📸 Screenshots
+## 📸 Screenshot
 
-*(Replace this section with screenshots of your live application before submission)*
+![alt text](image.png)
 
 ---
 
