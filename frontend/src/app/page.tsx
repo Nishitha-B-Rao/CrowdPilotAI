@@ -49,7 +49,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [isListening, setIsListening] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
-  const [translationData, setTranslationData] = useState<{originalText: string, translatedText: string, detectedLanguage: string} | null>(null);
+  const [translationData, setTranslationData] = useState<{originalText: string, translatedText: string, detectedLanguage: string, confidence?: string} | null>(null);
   const [aiLogs, setAiLogs] = useState<AILogEntry[]>([]);
 
   useEffect(() => {
