@@ -9,3 +9,5 @@ black
 flake8
 mypy
 isort
+pandas
+python-multipart

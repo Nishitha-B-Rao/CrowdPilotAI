@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
     GEMINI_API_KEY: str = ""
+    GCP_PROJECT_ID: str = ""
+    GCP_LOCATION: str = "us-central1"
 
     class Config:
         env_file = ".env"

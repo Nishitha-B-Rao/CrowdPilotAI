@@ -12,7 +12,13 @@ from app.repositories.vector_repo import VectorRepository
 class AIService:
     def __init__(self, vector_repo: VectorRepository):
         self.vector_repo = vector_repo
-        if settings.GEMINI_API_KEY:
+        if settings.GCP_PROJECT_ID:
+            self.client = genai.Client(
+                vertexai=True,
+                project=settings.GCP_PROJECT_ID,
+                location=settings.GCP_LOCATION
+            )
+        elif settings.GEMINI_API_KEY:
             self.client = genai.Client(api_key=settings.GEMINI_API_KEY)
         else:
             self.client = None
@@ -93,3 +99,43 @@ class AIService:
                 affectedZones=["All Zones"],
                 generatedLanguages={"en": "AI services are temporarily rate-limited."}
             )
+
+    def translate_text(self, text: str) -> dict:
+        """
+        Translate the provided text to English and detect source language.
+        """
+        prompt = f"""
+        You are a highly accurate translation API.
+        Identify the language of the following text, and translate it to English.
+        Text: "{text}"
+        
+        Output strictly as JSON matching this schema:
+        {{
+          "originalText": "The original text",
+          "translatedText": "The English translation",
+          "detectedLanguage": "The name of the detected source language (e.g. Spanish, French, Japanese)"
+        }}
+        """
+
+        if not self.client:
+            return {
+                "originalText": text,
+                "translatedText": "Mock translation: Hello, where is the nearest restroom?",
+                "detectedLanguage": "Mock Language"
+            }
+            
+        try:
+            response = self.client.models.generate_content(
+                model='gemini-2.5-flash',
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                ),
+            )
+            return json.loads(response.text)
+        except Exception as e:
+            return {
+                "originalText": text,
+                "translatedText": f"Translation failed: {str(e)[:50]}",
+                "detectedLanguage": "Unknown"
+            }

@@ -1,25 +1,70 @@
 # CrowdPilot AI - Smart Stadium Operations
 
-CrowdPilot AI is an advanced, Explainable AI (XAI) decision support platform designed specifically for FIFA World Cup 2026 stadium volunteers. It solves complex crowd management and multilingual assistance challenges by providing real-time, explainable recommendations based on live and historical data.
+CrowdPilot AI is an advanced, Explainable AI (XAI) decision support platform designed specifically for FIFA World Cup 2026 stadium volunteers. It solves complex crowd management and multilingual assistance challenges by providing real-time, explainable recommendations based on live telemetry and historical RAG data.
 
 ## Features
 
-- **Explainable AI (XAI) Core**: Every recommendation includes the Observation, Reasoning, Prediction, Action, and Expected Impact.
-- **Multilingual Assistant**: Supports live auto-detect translation for assisting international fans.
+- **Explainable AI (XAI) Core**: Every recommendation includes the Observation, Reasoning, Prediction, Action, and Expected Impact. Powered by Google Cloud's Vertex AI (Gemini 2.5 Flash).
+- **Multilingual Assistant**: A fully functional, browser-native Speech-to-Text module (Web Speech API) that allows volunteers to speak foreign languages and automatically transcribe them for translation.
 - **Incident Copilot**: Context-aware natural language interface for reporting emergencies.
-- **Enterprise Engineering**: Built on a strict Clean Architecture pattern (FastAPI) and modern Next.js React frontend.
+- **Enterprise Engineering**: Built on a strict Clean Architecture pattern (FastAPI) and a modern Next.js React frontend.
 
-## Quick Start
+---
 
-### 1. Environment Setup
+## Directory Structure
 
-Copy the example `.env` file in the backend directory and add your Google Gemini API key:
+The project is structured to strictly separate concerns to ensure scalability and testability:
+
+### `/backend` (FastAPI)
+The backend is built using a Clean Architecture approach:
+- `app/main.py`: The entry point for the FastAPI application.
+- `app/api/`: REST API endpoints and router configuration (e.g., `/copilot` for AI, `/upload` for CSVs).
+- `app/services/`: Core business logic, orchestration, and AI model interactions (`ai_service.py`, `data_processing_service.py`).
+- `app/repositories/`: Data access abstractions (e.g., Vector DB for RAG).
+- `app/models/`: Pydantic schemas for request/response validation.
+- `app/core/`: Security protocols, configuration management (`config.py`), and environment variables.
+
+### `/frontend` (Next.js & React)
+The frontend is a modern web app using TailwindCSS and Framer Motion:
+- `src/app/page.tsx`: The main "Live Operations" Volunteer Dashboard.
+- `src/app/layout.tsx`: The root layout defining the global HTML structure and fonts.
+- `src/app/globals.css`: Global stylesheet containing custom Dark/Light mode overrides and premium glassmorphism styling.
+- `src/components/Sidebar.tsx`: The dynamic, client-side navigation sidebar.
+- `src/app/incident-copilot/`, `src/app/analytics/`, `src/app/cost-dashboard/`: Secondary pages for the full app experience.
+
+---
+
+## Quick Start & Google Cloud Setup
+
+To use the full production-grade architecture, we use **Google Cloud Vertex AI** for enterprise reliability.
+
+### 1. Google Cloud Authentication (Vertex AI)
+
+Instead of using a standard API key, this project authenticates locally using Google Cloud Application Default Credentials (ADC).
+
+1. **Install the Google Cloud CLI**: If you don't have it, install `gcloud` from [cloud.google.com/sdk](https://cloud.google.com/sdk/docs/install).
+2. **Create a Project**: Go to the [Google Cloud Console](https://console.cloud.google.com/) and create a new project.
+3. **Enable the API**: Search for "Vertex AI API" in the console and click **Enable**.
+4. **Authenticate Locally**: Open your terminal and run:
+   ```bash
+   gcloud auth application-default login
+   ```
+   *This will open a browser window. Log in with your Google account and click Allow.*
+
+### 2. Environment Setup
+
+Copy the example `.env` file in the backend directory:
 ```bash
 cp backend/.env.example backend/.env
 ```
-Edit `backend/.env` and set `GEMINI_API_KEY=your_key_here`. (If not set, the AI will gracefully fall back to mock data).
+Edit `backend/.env` and add your Google Cloud Project ID:
+```env
+GCP_PROJECT_ID="your-google-cloud-project-id"
+GCP_LOCATION="us-central1"
+```
+*(Note: If `GCP_PROJECT_ID` is left empty, the app will attempt to fallback to `GEMINI_API_KEY` if provided).*
 
-### 2. Run the Backend (FastAPI)
+### 3. Run the Backend (FastAPI)
 
 ```bash
 cd backend
@@ -31,7 +76,7 @@ uvicorn app.main:app --reload
 ```
 The API will be available at `http://localhost:8000`. Swagger documentation is available at `http://localhost:8000/docs`.
 
-### 3. Run the Frontend (Next.js)
+### 4. Run the Frontend (Next.js)
 
 ```bash
 cd frontend
@@ -47,58 +92,18 @@ The application will be available at `http://localhost:3000`.
 Quality Assurance and testing are first-class citizens in this project. 
 
 ### Backend Testing (Pytest)
-
 The backend features comprehensive unit and integration tests with offline mocking.
-
 ```bash
 cd backend
 .\venv\Scripts\activate
-
 # Run all tests with coverage report
 pytest --cov=app --cov-report=term-missing
-
-# Run style/linting checks
-black --check app/
-flake8 app/
-mypy app/
 ```
 
 ### Frontend Testing (Vitest)
-
 The Next.js frontend uses Vitest and React Testing Library to verify component rendering and XAI pipeline interactions.
-
 ```bash
 cd frontend
-
-# Run test suite
 npm run test
-
-# Run test suite with coverage
 npm run test:coverage
-
-# Run linter
-npm run lint
 ```
-
-### Performance Load Testing (Locust)
-
-You can simulate thousands of concurrent users hitting the AI and dashboard endpoints to measure latency and memory consumption.
-
-1. Ensure your backend is running (`uvicorn app.main:app`).
-2. Open a new terminal and run:
-```bash
-cd backend
-.\venv\Scripts\activate
-locust -f locustfile.py
-```
-3. Navigate to `http://localhost:8089` in your browser to start the swarm.
-
----
-
-## Clean Architecture
-
-This project strictly separates concerns to ensure scalability and testability:
-- `app/api/`: REST API endpoints and router configuration.
-- `app/services/`: Core business logic, orchestration, and AI model interactions.
-- `app/repositories/`: Data access abstractions (e.g., Vector DB for RAG).
-- `app/core/`: Security protocols, configuration management, and environment variables.

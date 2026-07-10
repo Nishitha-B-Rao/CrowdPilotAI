@@ -1,0 +1,96 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { LayoutDashboard, AlertTriangle, BarChart3, DollarSign } from "lucide-react";
+
+export function Sidebar() {
+  const [isDark, setIsDark] = useState(true);
+
+  // Apply dark mode to document
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [isDark]);
+
+  return (
+    <aside className="w-64 glass border-r-0 border-r-white/5 hidden md:flex flex-col m-4 mr-0 rounded-2xl relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none"></div>
+      
+      <div className="p-6 relative">
+        <h1 className="text-2xl font-bold tracking-tight text-gradient">CrowdPilot AI</h1>
+        <p className="text-xs text-muted-foreground uppercase tracking-widest mt-1 font-semibold">Stadium Intel</p>
+      </div>
+      
+      <nav className="flex-1 overflow-y-auto py-4 relative z-10">
+        <ul className="space-y-2 px-4">
+          <li>
+            <Link href="/" className="flex items-center px-4 py-3 text-sm font-medium rounded-xl bg-gradient-to-r from-primary/20 to-primary/5 text-primary shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] border border-primary/20 transition-all">
+              <LayoutDashboard size={18} className="mr-3" />
+              Volunteer Dashboard
+            </Link>
+          </li>
+          <li>
+            <Link href="/incident-copilot" className="flex items-center px-4 py-3 text-sm font-medium rounded-xl text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all">
+              <AlertTriangle size={18} className="mr-3 opacity-70" />
+              Incident Copilot
+            </Link>
+          </li>
+          <li>
+            <Link href="/analytics" className="flex items-center px-4 py-3 text-sm font-medium rounded-xl text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all">
+              <BarChart3 size={18} className="mr-3 opacity-70" />
+              Analytics
+            </Link>
+          </li>
+          <li>
+            <Link href="/cost-dashboard" className="flex items-center px-4 py-3 text-sm font-medium rounded-xl text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all">
+              <DollarSign size={18} className="mr-3 opacity-70" />
+              Cost Dashboard
+            </Link>
+          </li>
+        </ul>
+      </nav>
+
+      {/* Added Settings Panel for Hackathon Requirements */}
+      <div className="px-6 py-4 relative z-10 border-t border-white/5">
+        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Settings</h3>
+        
+        <div className="space-y-3">
+          {/* Theme Toggle */}
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-white/80">Dark Mode</span>
+            <button 
+              onClick={() => setIsDark(!isDark)}
+              className={`w-10 h-5 rounded-full relative transition-colors shadow-inner ${isDark ? 'bg-emerald-500' : 'bg-gray-400'}`}
+            >
+              <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transform transition-transform ${isDark ? 'right-1' : 'translate-x-1'}`}></span>
+            </button>
+          </div>
+          
+          {/* Language Select */}
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-white/80">Language</span>
+            <select className="bg-white/10 border border-white/20 text-white text-xs rounded-md px-2 py-1 outline-none focus:border-primary">
+              <option value="en">English (US)</option>
+              <option value="es">Español</option>
+              <option value="fr">Français</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      <div className="p-4 relative z-10 m-4 glass-panel rounded-xl">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-primary/30">V4</div>
+          <div>
+            <p className="text-sm font-semibold text-white">Volunteer 42</p>
+            <p className="text-xs text-primary/80 font-medium">Gate C Team</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+  );
+}

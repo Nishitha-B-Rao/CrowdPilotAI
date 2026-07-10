@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.api.deps import get_ai_service
-from app.models.schemas import AIRecommendation, ContextRequest
+from app.models.schemas import AIRecommendation, ContextRequest, TranslateRequest, TranslateResponse
 from app.services.ai_service import AIService
 
 router = APIRouter()
@@ -17,3 +17,14 @@ async def get_recommendation(req: ContextRequest, ai_service: AIService = Depend
         return recommendation
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to generate recommendation: {str(e)}")
+
+@router.post("/translate", response_model=TranslateResponse)
+async def translate_text(req: TranslateRequest, ai_service: AIService = Depends(get_ai_service)):
+    """
+    Translate text to English using Vertex AI.
+    """
+    try:
+        translation = ai_service.translate_text(req.text)
+        return translation
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to translate: {str(e)}")

@@ -8,9 +8,11 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: './vitest.setup.ts',
-    alias: {
-      '@': path.resolve(__dirname, './src')
-    },
+    css: false,
+    alias: [
+      { find: '@', replacement: path.resolve(__dirname, './src') },
+      { find: /\.css$/, replacement: path.resolve(__dirname, './__mocks__/styleMock.ts') }
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
@@ -19,6 +21,11 @@ export default defineConfig({
         functions: 80,
         branches: 80,
         statements: 80
+      }
+    },
+    server: {
+      deps: {
+        inline: true
       }
     }
   }

@@ -19,3 +19,11 @@ class AIRecommendation(BaseModel):
 
 class ContextRequest(BaseModel):
     context: str = Field(..., description="The context to analyze")
+
+class TranslateRequest(BaseModel):
+    text: str = Field(..., description="Text to translate to English")
+
+class TranslateResponse(BaseModel):
+    originalText: str
+    translatedText: str
+    detectedLanguage: str

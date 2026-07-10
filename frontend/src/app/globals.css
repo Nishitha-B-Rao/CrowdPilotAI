@@ -63,6 +63,42 @@
   --radius: 0.75rem;
 }
 
+/* Light Mode Overrides for Hackathon Demo */
+:root:not(.dark) body {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+:root:not(.dark) .glass,
+:root:not(.dark) .glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  color: #0f172a;
+}
+:root:not(.dark) .text-white {
+  color: #0f172a !important;
+}
+:root:not(.dark) .text-white\/70,
+:root:not(.dark) .text-white\/80,
+:root:not(.dark) .text-white\/90 {
+  color: #475569 !important;
+}
+:root:not(.dark) .text-muted-foreground {
+  color: #64748b !important;
+}
+:root:not(.dark) .border-white\/5,
+:root:not(.dark) .border-white\/10,
+:root:not(.dark) .border-white\/20 {
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+:root:not(.dark) .bg-white\/5,
+:root:not(.dark) .bg-white\/10 {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+:root:not(.dark) .shadow-\[inset_0_1px_0_rgba\(255\,255\,255\,0\.1\)\] {
+  box-shadow: inset 0 1px 0 rgba(0,0,0,0.05) !important;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
