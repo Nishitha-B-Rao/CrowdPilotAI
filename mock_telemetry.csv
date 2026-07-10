@@ -1,6 +1,0 @@
-gate_id,occupancy,queue_time
-north_gate,95,25
-south_gate,10,2
-east_gate,15,3
-west_gate,45,10
-vip_entrance,5,1

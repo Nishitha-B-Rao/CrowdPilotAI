@@ -10,6 +10,8 @@ from app.repositories.vector_repo import VectorRepository
 
 
 class AIService:
+    client: Optional[genai.Client]
+    
     def __init__(self, vector_repo: VectorRepository):
         self.vector_repo = vector_repo
         if settings.GCP_PROJECT_ID:
@@ -113,7 +115,8 @@ class AIService:
         {{
           "originalText": "The original text",
           "translatedText": "The English translation",
-          "detectedLanguage": "The name of the detected source language (e.g. Spanish, French, Japanese)"
+          "detectedLanguage": "The name of the detected source language (e.g. Spanish, French, Japanese)",
+          "confidence": "e.g., 98%"
         }}
         """
 
@@ -121,7 +124,8 @@ class AIService:
             return {
                 "originalText": text,
                 "translatedText": "Mock translation: Hello, where is the nearest restroom?",
-                "detectedLanguage": "Mock Language"
+                "detectedLanguage": "Mock Language",
+                "confidence": "99%"
             }
             
         try:
@@ -137,5 +141,65 @@ class AIService:
             return {
                 "originalText": text,
                 "translatedText": f"Translation failed: {str(e)[:50]}",
-                "detectedLanguage": "Unknown"
+                "detectedLanguage": "Unknown",
+                "confidence": "0%"
+            }
+
+    def process_incidents(self, csv_data: str) -> dict:
+        """
+        Process a CSV string of incidents and generate AI responses.
+        """
+        prompt = f"""
+        You are a highly experienced stadium operations manager and AI copilot.
+        I am giving you a CSV of reported incidents in the stadium.
+        
+        CSV DATA:
+        {csv_data}
+        
+        For each incident in the CSV, determine the correct priority (low, medium, high, critical),
+        provide the reasoning, determine the correct operational response, and generate a brief public announcement (or "N/A" if none is needed).
+        
+        Output strictly as JSON matching this schema:
+        {{
+          "incidents": [
+            {{
+              "time": "Time of incident",
+              "incident": "Type of incident",
+              "gate": "Location",
+              "priority": "low|medium|high|critical",
+              "reasoning": "Why this priority and response was chosen",
+              "response": "The action to take",
+              "announcement": "Public announcement text if any, else N/A"
+            }}
+          ]
+        }}
+        """
+
+        if not self.client:
+            return {
+                "incidents": [
+                    {
+                        "time": "10:00",
+                        "incident": "Mock API Key Missing",
+                        "gate": "A",
+                        "priority": "low",
+                        "reasoning": "No API key configured.",
+                        "response": "Provide GCP credentials.",
+                        "announcement": "N/A"
+                    }
+                ]
+            }
+
+        try:
+            response = self.client.models.generate_content(
+                model='gemini-2.5-flash',
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                ),
+            )
+            return json.loads(response.text)
+        except Exception as e:
+            return {
+                "incidents": []
             }

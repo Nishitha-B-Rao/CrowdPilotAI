@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { LayoutDashboard, AlertTriangle, BarChart3, DollarSign } from "lucide-react";
 
 export function Sidebar() {
@@ -16,6 +17,19 @@ export function Sidebar() {
     }
   }, [isDark]);
 
+  const pathname = usePathname();
+
+  // Helper to determine link styles
+  const getLinkClasses = (path: string) => {
+    return pathname === path
+      ? "flex items-center px-4 py-3 text-sm font-medium rounded-xl bg-gradient-to-r from-primary/20 to-primary/5 text-primary shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] border border-primary/20 transition-all"
+      : "flex items-center px-4 py-3 text-sm font-medium rounded-xl text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all";
+  };
+
+  const getIconClasses = (path: string) => {
+    return pathname === path ? "mr-3" : "mr-3 opacity-70";
+  };
+
   return (
     <aside className="w-64 glass border-r-0 border-r-white/5 hidden md:flex flex-col m-4 mr-0 rounded-2xl relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none"></div>
@@ -28,26 +42,26 @@ export function Sidebar() {
       <nav className="flex-1 overflow-y-auto py-4 relative z-10">
         <ul className="space-y-2 px-4">
           <li>
-            <Link href="/" className="flex items-center px-4 py-3 text-sm font-medium rounded-xl bg-gradient-to-r from-primary/20 to-primary/5 text-primary shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] border border-primary/20 transition-all">
-              <LayoutDashboard size={18} className="mr-3" />
+            <Link href="/" className={getLinkClasses("/")}>
+              <LayoutDashboard size={18} className={getIconClasses("/")} />
               Volunteer Dashboard
             </Link>
           </li>
           <li>
-            <Link href="/incident-copilot" className="flex items-center px-4 py-3 text-sm font-medium rounded-xl text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all">
-              <AlertTriangle size={18} className="mr-3 opacity-70" />
+            <Link href="/incident-copilot" className={getLinkClasses("/incident-copilot")}>
+              <AlertTriangle size={18} className={getIconClasses("/incident-copilot")} />
               Incident Copilot
             </Link>
           </li>
           <li>
-            <Link href="/analytics" className="flex items-center px-4 py-3 text-sm font-medium rounded-xl text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all">
-              <BarChart3 size={18} className="mr-3 opacity-70" />
+            <Link href="/analytics" className={getLinkClasses("/analytics")}>
+              <BarChart3 size={18} className={getIconClasses("/analytics")} />
               Analytics
             </Link>
           </li>
           <li>
-            <Link href="/cost-dashboard" className="flex items-center px-4 py-3 text-sm font-medium rounded-xl text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all">
-              <DollarSign size={18} className="mr-3 opacity-70" />
+            <Link href="/cost-dashboard" className={getLinkClasses("/cost-dashboard")}>
+              <DollarSign size={18} className={getIconClasses("/cost-dashboard")} />
               Cost Dashboard
             </Link>
           </li>
@@ -70,15 +84,6 @@ export function Sidebar() {
             </button>
           </div>
           
-          {/* Language Select */}
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-white/80">Language</span>
-            <select className="bg-white/10 border border-white/20 text-white text-xs rounded-md px-2 py-1 outline-none focus:border-primary">
-              <option value="en">English (US)</option>
-              <option value="es">Español</option>
-              <option value="fr">Français</option>
-            </select>
-          </div>
         </div>
       </div>
       

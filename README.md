@@ -2,108 +2,135 @@
 
 CrowdPilot AI is an advanced, Explainable AI (XAI) decision support platform designed specifically for FIFA World Cup 2026 stadium volunteers. It solves complex crowd management and multilingual assistance challenges by providing real-time, explainable recommendations based on live telemetry and historical RAG data.
 
-## Features
+---
 
-- **Explainable AI (XAI) Core**: Every recommendation includes the Observation, Reasoning, Prediction, Action, and Expected Impact. Powered by Google Cloud's Vertex AI (Gemini 2.5 Flash).
-- **Multilingual Assistant**: A fully functional, browser-native Speech-to-Text module (Web Speech API) that allows volunteers to speak foreign languages and automatically transcribe them for translation.
-- **Incident Copilot**: Context-aware natural language interface for reporting emergencies.
-- **Enterprise Engineering**: Built on a strict Clean Architecture pattern (FastAPI) and a modern Next.js React frontend.
+## 🛑 The Problem
+
+Managing a global event like the FIFA World Cup involves highly dynamic, unpredictable crowds and extreme language barriers. Volunteers are often overwhelmed by sudden bottlenecks and lack the operational visibility or language skills to redirect fans efficiently. Without real-time, explainable guidance, minor incidents can escalate into critical safety hazards.
 
 ---
 
-## Directory Structure
+## 🏗️ Architecture
 
-The project is structured to strictly separate concerns to ensure scalability and testability:
-
-### `/backend` (FastAPI)
-The backend is built using a Clean Architecture approach:
-- `app/main.py`: The entry point for the FastAPI application.
-- `app/api/`: REST API endpoints and router configuration (e.g., `/copilot` for AI, `/upload` for CSVs).
-- `app/services/`: Core business logic, orchestration, and AI model interactions (`ai_service.py`, `data_processing_service.py`).
-- `app/repositories/`: Data access abstractions (e.g., Vector DB for RAG).
-- `app/models/`: Pydantic schemas for request/response validation.
-- `app/core/`: Security protocols, configuration management (`config.py`), and environment variables.
-
-### `/frontend` (Next.js & React)
-The frontend is a modern web app using TailwindCSS and Framer Motion:
-- `src/app/page.tsx`: The main "Live Operations" Volunteer Dashboard.
-- `src/app/layout.tsx`: The root layout defining the global HTML structure and fonts.
-- `src/app/globals.css`: Global stylesheet containing custom Dark/Light mode overrides and premium glassmorphism styling.
-- `src/components/Sidebar.tsx`: The dynamic, client-side navigation sidebar.
-- `src/app/incident-copilot/`, `src/app/analytics/`, `src/app/cost-dashboard/`: Secondary pages for the full app experience.
+CrowdPilot AI utilizes a Clean Architecture pattern, decoupling the AI orchestration layer from the frontend presentation layer.
+- **Frontend**: Next.js React client with TailwindCSS and Framer Motion for a fluid, real-time operations dashboard.
+- **Backend**: FastAPI REST server acting as the telemetry single-source-of-truth.
+- **AI Brain**: Google Cloud Vertex AI (Gemini 2.5 Flash) orchestrating decisions, predicting bottlenecks, and translating audio.
+- **State Management**: Live telemetry polling updates the global stadium state, recalculating Cost Savings and Heatmaps dynamically based on crowd flow.
 
 ---
 
-## Quick Start & Google Cloud Setup
+## ✨ Features
 
-To use the full production-grade architecture, we use **Google Cloud Vertex AI** for enterprise reliability.
+- **Explainable AI (XAI) Decision Engine**: Generates continuous routing recommendations. Every decision includes the Observation, Reasoning, Prediction, Action, and Expected Impact. 
+- **AI Incident Copilot**: Upload raw incident reports (CSV) and the AI automatically assigns priorities, reasoning, and public announcement scripts.
+- **Multilingual Assistant**: A browser-native Speech-to-Text module that allows volunteers to speak foreign languages and automatically transcribe and translate them.
+- **Live Spatial Heatmap**: Real-time visualization of gate occupancy.
+- **Dynamic Cost Dashboard**: Calculates estimated USD savings and volunteer overtime prevented based on live crowd redirection metrics.
+- **AI Activity Log**: A live, scrolling terminal tracking every Vertex AI interaction, including latency and confidence scores.
+
+---
+
+## 🧠 AI Workflow
+
+1. **Ingestion**: Raw telemetry data (`crowd_data.csv`) and incident reports (`incidents.csv`) are uploaded to the FastAPI backend.
+2. **State Processing**: The Data Processing Service sanitizes the input and updates the global `StadiumState`.
+3. **Vertex AI Inference**: The telemetry state is injected into a highly engineered prompt and sent to Gemini 2.5 Flash.
+4. **Structured Output**: The model returns a strict JSON schema containing the AI's reasoning, confidence, and action plan.
+5. **UI Rendering**: The frontend polls the backend and renders the XAI flow in a beautiful, human-readable timeline.
+
+---
+
+## 📁 Folder Structure
+
+```
+CrowdPilotAI/
+├── backend/
+│   ├── app/
+│   │   ├── api/           # REST API endpoints (copilot, telemetry)
+│   │   ├── models/        # Pydantic schemas (AILogEntry, StadiumState)
+│   │   ├── services/      # Core logic (AIService, TelemetryService)
+│   │   └── main.py        # FastAPI entry point
+│   ├── tests/             # Pytest backend test suite
+│   ├── Dockerfile         # Backend containerization
+│   └── requirements.txt
+├── frontend/
+│   ├── src/
+│   │   ├── app/           # Next.js App Router (page.tsx, analytics, etc)
+│   │   ├── components/    # Reusable React components (Sidebar, CsvUploader)
+│   │   └── globals.css    # Tailwind & Glassmorphism styles
+│   └── Dockerfile         # Frontend containerization
+├── crowd_data.csv         # Demo dataset for live telemetry
+└── incidents.csv          # Demo dataset for Incident Copilot
+```
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend**: Next.js 15, React 19, TailwindCSS, Framer Motion, Lucide Icons
+- **Backend**: Python 3.11, FastAPI, Uvicorn, Pandas, Pydantic
+- **AI / ML**: Google Cloud Vertex AI (Gemini 2.5 Flash), Google Cloud ADC
+- **Testing**: Pytest (Backend), Jest (Frontend)
+- **Deployment**: Docker, Google Cloud Run
+
+---
+
+## ⚙️ Setup
 
 ### 1. Google Cloud Authentication (Vertex AI)
 
 Instead of using a standard API key, this project authenticates locally using Google Cloud Application Default Credentials (ADC).
 
-1. **Install the Google Cloud CLI**: If you don't have it, install `gcloud` from [cloud.google.com/sdk](https://cloud.google.com/sdk/docs/install).
-2. **Create a Project**: Go to the [Google Cloud Console](https://console.cloud.google.com/) and create a new project.
-3. **Enable the API**: Search for "Vertex AI API" in the console and click **Enable**.
-4. **Authenticate Locally**: Open your terminal and run:
+1. Install the [Google Cloud CLI](https://cloud.google.com/sdk/docs/install).
+2. Run the following command in your terminal to authenticate:
    ```bash
    gcloud auth application-default login
    ```
-   *This will open a browser window. Log in with your Google account and click Allow.*
+3. Set up the `.env` file in the backend directory:
+   ```bash
+   cp backend/.env.example backend/.env
+   ```
+4. Edit `backend/.env` and add your GCP Project ID:
+   ```env
+   GCP_PROJECT_ID="your-google-cloud-project-id"
+   GCP_LOCATION="us-central1"
+   ```
 
-### 2. Environment Setup
+---
 
-Copy the example `.env` file in the backend directory:
-```bash
-cp backend/.env.example backend/.env
-```
-Edit `backend/.env` and add your Google Cloud Project ID:
-```env
-GCP_PROJECT_ID="your-google-cloud-project-id"
-GCP_LOCATION="us-central1"
-```
-*(Note: If `GCP_PROJECT_ID` is left empty, the app will attempt to fallback to `GEMINI_API_KEY` if provided).*
+## 🚀 How to Run
 
-### 3. Run the Backend (FastAPI)
-
+### Backend (FastAPI)
 ```bash
 cd backend
 python -m venv venv
-.\venv\Scripts\activate  # On Windows
-# source venv/bin/activate # On Mac/Linux
+.\venv\Scripts\activate  # Windows
+# source venv/bin/activate # Mac/Linux
 pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
-The API will be available at `http://localhost:8000`. Swagger documentation is available at `http://localhost:8000/docs`.
+API available at `http://localhost:8000`.
 
-### 4. Run the Frontend (Next.js)
-
+### Frontend (Next.js)
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-The application will be available at `http://localhost:3000`.
+App available at `http://localhost:3000`.
 
 ---
 
-## How to Test
+## 📸 Screenshots
 
-Quality Assurance and testing are first-class citizens in this project. 
+*(To be added by the user prior to submission. Recommended screenshots: The main dashboard with the Decision Timeline, the live Heatmap, and the AI Incident Copilot).*
 
-### Backend Testing (Pytest)
-The backend features comprehensive unit and integration tests with offline mocking.
-```bash
-cd backend
-.\venv\Scripts\activate
-# Run all tests with coverage report
-pytest --cov=app --cov-report=term-missing
-```
+---
 
-### Frontend Testing (Vitest)
-The Next.js frontend uses Vitest and React Testing Library to verify component rendering and XAI pipeline interactions.
-```bash
-cd frontend
-npm run test
-npm run test:coverage
-```
+## 🔮 Future Scope
+
+- **Real Hardware Integration**: Replace CSV uploads with direct WebSockets connecting to physical turnstiles and CCTV computer vision APIs.
+- **RAG Expansion**: Integrate a massive Vector Database (Pinecone/Weaviate) containing decades of historical stadium crowd data to improve Vertex AI's prediction accuracy.
+- **Mobile Volunteer App**: Port the React application to React Native for a dedicated iOS/Android app for field volunteers.
+- **Multi-Agent Orchestration**: Deploy separate Vertex AI agents (e.g., Medical Agent, Security Agent) that communicate and negotiate response priorities.

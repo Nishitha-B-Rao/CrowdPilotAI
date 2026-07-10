@@ -13,3 +13,10 @@ async def get_stadium_state(telemetry_service: TelemetryService = Depends(get_te
     Get the current live simulated state of the stadium (gates, queues, etc).
     """
     return telemetry_service.generate_live_state()
+
+@router.get("/ai-logs")
+async def get_ai_logs(telemetry_service: TelemetryService = Depends(get_telemetry_service)):
+    """
+    Get the latest AI activity logs.
+    """
+    return {"logs": telemetry_service.ai_logs}

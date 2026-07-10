@@ -5,6 +5,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Activity, AlertTriangle, ArrowRight, CheckCircle2, ChevronDown, ChevronUp, Users, Mic, Radio } from "lucide-react";
 import { CsvUploader } from "@/components/CsvUploader";
 
+type AILogEntry = {
+  timestamp: string;
+  input_type: string;
+  model: string;
+  latency_ms: number;
+  confidence: string;
+  status: string;
+};
+
 type Recommendation = {
   id: string;
   timestamp: string;
@@ -41,6 +50,7 @@ export default function Dashboard() {
   const [isListening, setIsListening] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
   const [translationData, setTranslationData] = useState<{originalText: string, translatedText: string, detectedLanguage: string} | null>(null);
+  const [aiLogs, setAiLogs] = useState<AILogEntry[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -66,6 +76,13 @@ export default function Dashboard() {
           id: `rec-${Date.now()}`,
           timestamp: new Date().toLocaleTimeString(),
         }]);
+        
+        // Fetch AI Logs
+        const logsRes = await fetch("http://localhost:8000/api/v1/telemetry/ai-logs");
+        if (logsRes.ok) {
+          const logsData = await logsRes.json();
+          setAiLogs(logsData.logs || []);
+        }
         
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -243,11 +260,25 @@ export default function Dashboard() {
                             </div>
                           </div>
                           
-                          <div className="flex flex-wrap gap-3 items-center bg-white/5 p-4 rounded-xl border border-white/5">
-                            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mr-2">Impacted Zones:</span>
-                            {rec.affectedZones.map(z => (
-                              <span key={z} className="bg-primary/20 text-primary text-xs font-bold px-3 py-1.5 rounded-lg border border-primary/30 shadow-[0_0_10px_rgba(99,102,241,0.2)]">{z}</span>
-                            ))}
+                          <div className="flex flex-col space-y-4 bg-white/5 p-4 rounded-xl border border-white/5">
+                            <div className="flex items-center justify-between">
+                              <div className="flex flex-wrap gap-3 items-center">
+                                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mr-2">Impacted Zones:</span>
+                                {rec.affectedZones.map(z => (
+                                  <span key={z} className="bg-primary/20 text-primary text-xs font-bold px-3 py-1.5 rounded-lg border border-primary/30 shadow-[0_0_10px_rgba(99,102,241,0.2)]">{z}</span>
+                                ))}
+                              </div>
+                              
+                              <div className="flex items-center space-x-3 bg-black/40 px-4 py-2 rounded-lg border border-white/10">
+                                <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">AI Confidence</span>
+                                <div className="flex items-center">
+                                  <div className="w-16 h-2 bg-white/10 rounded-full mr-3 overflow-hidden">
+                                    <div className="h-full bg-emerald-400" style={{ width: `${rec.confidence.replace('%', '')}%` }}></div>
+                                  </div>
+                                  <span className="text-emerald-400 font-bold">{rec.confidence}</span>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </motion.div>
@@ -267,21 +298,29 @@ export default function Dashboard() {
               <Activity size={18} className="mr-2 text-primary" /> Live Heatmap
             </h3>
             
-            {/* Animated Mesh Gradient Heatmap Mock */}
-            <div className="flex-1 rounded-xl border border-white/10 relative overflow-hidden group flex items-center justify-center bg-gray-900">
-              {/* Complex CSS animated background for heatmap feel */}
-              <div className="absolute inset-0 opacity-60 mix-blend-screen animate-slow-spin" 
-                   style={{ 
-                     backgroundImage: 'radial-gradient(circle at 50% 50%, #ef4444 0%, transparent 40%), radial-gradient(circle at 80% 20%, #f59e0b 0%, transparent 30%), radial-gradient(circle at 20% 80%, #3b82f6 0%, transparent 40%)',
-                     filter: 'blur(30px)',
-                     transform: 'scale(1.5)'
-                   }}>
-              </div>
-              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-              
-              <div className="z-10 bg-black/40 backdrop-blur-md px-4 py-2 rounded-lg border border-white/10 flex items-center text-sm font-medium text-white shadow-xl">
-                <div className="w-2 h-2 rounded-full bg-red-500 animate-ping mr-3"></div>
-                Rendering Spatial Data...
+            {/* Dynamic Telemetry Heatmap */}
+            <div className="flex-1 rounded-xl border border-white/10 relative overflow-hidden flex flex-col p-4 bg-black/40">
+              <div className="grid grid-cols-2 gap-3 h-full">
+                {telemetry?.gates?.slice(0, 4).map(gate => {
+                  const isHigh = gate.occupancy_percentage > 80;
+                  const isMed = gate.occupancy_percentage > 50;
+                  const bgClass = isHigh ? "bg-red-500/20 border-red-500/50" : (isMed ? "bg-yellow-500/20 border-yellow-500/50" : "bg-emerald-500/20 border-emerald-500/50");
+                  const textClass = isHigh ? "text-red-400" : (isMed ? "text-yellow-400" : "text-emerald-400");
+                  
+                  return (
+                    <div key={gate.id} className={`rounded-lg border p-3 flex flex-col justify-between transition-colors ${bgClass}`}>
+                      <span className="text-xs font-semibold text-white/70 uppercase">{gate.name}</span>
+                      <div className="flex items-end justify-between mt-2">
+                        <span className={`text-2xl font-bold ${textClass}`}>{gate.occupancy_percentage}%</span>
+                        <span className="text-xs text-white/50">{gate.queue_time_minutes}m wait</span>
+                      </div>
+                    </div>
+                  );
+                }) || (
+                  <div className="col-span-2 flex items-center justify-center h-full">
+                     <span className="text-white/50 text-sm animate-pulse">Waiting for telemetry...</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -321,7 +360,14 @@ export default function Dashboard() {
                 </div>
               ) : translationData ? (
                 <div className="flex flex-col items-center justify-center w-full animate-in fade-in duration-500">
-                  <span className="text-xs font-bold px-2 py-0.5 rounded bg-white/10 text-white/70 mb-2">{translationData.detectedLanguage}</span>
+                  <div className="flex space-x-2 mb-2">
+                    <span className="text-xs font-bold px-2 py-0.5 rounded bg-white/10 text-white/70">{translationData.detectedLanguage}</span>
+                    {translationData.confidence && (
+                      <span className="text-xs font-bold px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
+                        {translationData.confidence} Confidence
+                      </span>
+                    )}
+                  </div>
                   <p className="text-sm font-medium text-white/90 mb-2 italic">"{translationData.originalText}"</p>
                   <div className="w-full h-px bg-white/10 my-2"></div>
                   <span className="text-xs font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 mb-2">English Translation</span>
@@ -423,6 +469,49 @@ export default function Dashboard() {
                     </button>
                   </div>
                 </>
+              )}
+            </div>
+          </div>
+
+          {/* AI Activity Log Panel */}
+          <div className="glass-panel p-6 rounded-2xl border border-white/10 relative overflow-hidden flex flex-col min-h-[250px] mt-6">
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent pointer-events-none"></div>
+            
+            <div className="flex justify-between items-center mb-6 relative z-10">
+              <h2 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-emerald-600">
+                AI Activity Log
+              </h2>
+              <div className="flex items-center space-x-2 bg-green-500/10 px-3 py-1 rounded-full border border-green-500/20">
+                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.8)]"></div>
+                <span className="text-xs font-medium text-green-400">Live</span>
+              </div>
+            </div>
+
+            <div className="flex-1 space-y-3 overflow-y-auto pr-2 custom-scrollbar max-h-[300px] relative z-10">
+              {aiLogs.length === 0 ? (
+                <div className="text-white/40 text-sm italic text-center py-8">Waiting for AI Activity...</div>
+              ) : (
+                aiLogs.map((log, idx) => (
+                  <div key={idx} className="bg-black/40 border border-white/5 rounded-lg p-3 text-xs font-mono">
+                    <div className="flex justify-between text-white/50 mb-1">
+                      <span>[{log.timestamp}]</span>
+                      <span className={log.latency_ms > 2000 ? 'text-orange-400' : 'text-emerald-400'}>{log.latency_ms}ms</span>
+                    </div>
+                    <div className="grid grid-cols-[80px_1fr] gap-2 mt-2">
+                      <span className="text-muted-foreground">Input:</span>
+                      <span className="text-white/90">{log.input_type}</span>
+                      
+                      <span className="text-muted-foreground">Model:</span>
+                      <span className="text-cyan-400">{log.model}</span>
+                      
+                      <span className="text-muted-foreground">Confidence:</span>
+                      <span className="text-emerald-400">{log.confidence}</span>
+                      
+                      <span className="text-muted-foreground">Status:</span>
+                      <span className="text-white/80">{log.status}</span>
+                    </div>
+                  </div>
+                ))
               )}
             </div>
           </div>
