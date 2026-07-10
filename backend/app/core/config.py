@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str = ""
     GCP_PROJECT_ID: str = ""
     GCP_LOCATION: str = "us-central1"
+    CORS_ORIGINS: str = "http://localhost:3000"
 
     class Config:
         env_file = ".env"

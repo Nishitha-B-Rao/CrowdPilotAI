@@ -1,5 +1,7 @@
 "use client";
 
+import { API_URL } from "@/lib/config";
+
 import { useState, useEffect } from "react";
 
 export default function Analytics() {
@@ -9,8 +11,7 @@ export default function Analytics() {
   useEffect(() => {
     const fetchTelemetry = async () => {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-        const res = await fetch(`${apiUrl}/api/v1/telemetry/state`);
+        const res = await fetch(`${API_URL}/api/v1/telemetry/state`);
         if (res.ok) {
           const data = await res.json();
           // Total capacity of stadium is 80,000 for this demo

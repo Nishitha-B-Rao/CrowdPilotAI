@@ -1,5 +1,7 @@
 "use client";
 
+import { API_URL } from "@/lib/config";
+
 import { useState, useEffect } from "react";
 
 export default function CostDashboard() {
@@ -14,8 +16,7 @@ export default function CostDashboard() {
   useEffect(() => {
     const fetchTelemetry = async () => {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-        const res = await fetch(`${apiUrl}/api/v1/telemetry/state`);
+        const res = await fetch(`${API_URL}/api/v1/telemetry/state`);
         if (res.ok) {
           const data = await res.json();
           if (data.cost_metrics) {

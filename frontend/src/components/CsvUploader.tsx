@@ -1,5 +1,7 @@
 "use client";
 
+import { API_URL } from "@/lib/config";
+
 import { useState } from "react";
 import { UploadCloud, CheckCircle, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
@@ -25,8 +27,7 @@ export function CsvUploader({ onUploadSuccess }: CsvUploaderProps) {
     formData.append("file", file);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-      const res = await fetch(`${apiUrl}/api/v1/upload/csv`, {
+      const res = await fetch(`${API_URL}/api/v1/upload/csv`, {
         method: "POST",
         body: formData,
       });

@@ -1,5 +1,7 @@
 "use client";
 
+import { API_URL } from "@/lib/config";
+
 import { useState } from "react";
 import { Upload } from "lucide-react";
 
@@ -15,8 +17,7 @@ export default function IncidentCopilot() {
     formData.append("file", e.target.files[0]);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-      const res = await fetch(`${apiUrl}/api/v1/copilot/incidents/upload`, {
+      const res = await fetch(`${API_URL}/api/v1/copilot/incidents/upload`, {
         method: "POST",
         body: formData
       });

@@ -1,4 +1,6 @@
 import json
+import csv
+import io
 from typing import Optional
 
 from google import genai
@@ -147,16 +149,30 @@ class AIService:
 
     def process_incidents(self, csv_data: str) -> dict:
         """
-        Process a CSV string of incidents and generate AI responses.
+        Process a CSV string of incidents, summarize it, and generate AI responses.
         """
+        try:
+            reader = csv.DictReader(io.StringIO(csv_data))
+            summarized_incidents = []
+            for row in reader:
+                # Basic summarization of each row
+                time_val = row.get("time", "Unknown Time")
+                gate_val = row.get("gate_id", "Unknown Gate")
+                desc_val = row.get("description", "No description")
+                summarized_incidents.append(f"[{time_val}] Gate {gate_val}: {desc_val}")
+            
+            summary_string = "\n".join(summarized_incidents)
+        except Exception as e:
+            summary_string = "Failed to parse CSV data."
+
         prompt = f"""
         You are a highly experienced stadium operations manager and AI copilot.
-        I am giving you a CSV of reported incidents in the stadium.
+        I am giving you a summary of reported incidents in the stadium.
         
-        CSV DATA:
-        {csv_data}
+        INCIDENT SUMMARY:
+        {summary_string}
         
-        For each incident in the CSV, determine the correct priority (low, medium, high, critical),
+        For each incident in the summary, determine the correct priority (low, medium, high, critical),
         provide the reasoning, determine the correct operational response, and generate a brief public announcement (or "N/A" if none is needed).
         
         Output strictly as JSON matching this schema:
