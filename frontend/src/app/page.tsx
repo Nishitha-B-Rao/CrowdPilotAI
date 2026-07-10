@@ -301,7 +301,7 @@ export default function Dashboard() {
             {/* Dynamic Telemetry Heatmap */}
             <div className="flex-1 rounded-xl border border-white/10 relative overflow-hidden flex flex-col p-4 bg-black/40">
               <div className="grid grid-cols-2 gap-3 h-full">
-                {telemetry?.gates?.slice(0, 4).map(gate => {
+                {stadiumState?.gates?.slice(0, 4).map(gate => {
                   const isHigh = gate.occupancy_percentage > 80;
                   const isMed = gate.occupancy_percentage > 50;
                   const bgClass = isHigh ? "bg-red-500/20 border-red-500/50" : (isMed ? "bg-yellow-500/20 border-yellow-500/50" : "bg-emerald-500/20 border-emerald-500/50");

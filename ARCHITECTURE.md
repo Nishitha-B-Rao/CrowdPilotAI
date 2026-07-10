@@ -25,33 +25,28 @@ The Service layer (`app/services/`) contains the core orchestration logic.
   - `AIService`: Manages prompt engineering, RAG context injection, and structured JSON parsing from the Gemini API.
 
 ### 4. Data / Repository Layer
-The Repository layer (`app/repositories/`) abstracts all database and external storage interactions.
-- **Role:** Isolates the database implementation from the business logic.
+The architecture is designed to support a Repository layer for abstracting database storage, though for this hackathon prototype, data state is managed in-memory or via streaming CSVs to focus on real-time GenAI orchestration.
 - **Key Components:**
-  - `VectorRepository`: Interfaces with ChromaDB for storing and retrieving historical context (Retrieval-Augmented Generation).
+  - `DataProcessingService`: Handles the ingestion, parsing, and streaming of operational files (crowd density, incident reports).
 
 ---
 
 ## Technical Stack
 
 ### Frontend
-- **Framework:** Next.js 14 (App Router)
+- **Framework:** Next.js (App Router)
 - **Language:** TypeScript
-- **Styling:** Tailwind CSS v4, shadcn/ui
+- **Styling:** Tailwind CSS, custom Glassmorphism
 - **Animations:** Framer Motion
 - **Icons:** Lucide React
-- **Testing:** Vitest, React Testing Library, jsdom
 
 ### Backend
-- **Framework:** FastAPI (Python 3.10+)
+- **Framework:** FastAPI (Python 3.11)
 - **Server:** Uvicorn
-- **Validation:** Pydantic
-- **AI Integration:** Google Gemini SDK (`gemini-1.5-flash`)
-- **Vector Database:** ChromaDB (for RAG)
-- **Data Processing:** Pandas, NumPy, Scikit-learn (for analytics and CSV processing)
-- **Testing:** Pytest, Pytest-cov, FastAPI TestClient
-- **Performance Testing:** Locust
-- **Linting & Formatting:** Black, flake8, isort, mypy
+- **Validation:** Pydantic v2
+- **AI Integration:** Google GenAI SDK (`gemini-2.5-flash`)
+- **Data Processing:** Pandas (for analytics and CSV processing)
+- **Testing:** Pytest, FastAPI TestClient
 
 ---
 
@@ -73,7 +68,7 @@ A specialized interface where volunteers can report unstructured events ("Person
 ### 4. CSV Batch Analysis & Synthetic Data Streaming
 The system can process uploaded CSVs (Crowd Density, Gate Occupancy, Volunteer Reports) to perform batch predictions, or fall back to a real-time synthetic data stream mimicking live stadium conditions.
 
-### 5. Enterprise-Grade QA Pipeline
-- **>90% Target Backend Coverage** with offline mocking.
-- **Automated CI/CD** via GitHub actions for linting, typing, and testing.
-- **Load testing** ready for scaling up to thousands of concurrent volunteers.
+### 5. Cloud-Native Readiness
+- **Dockerized**: Fully containerized backend and frontend.
+- **Stateless Architecture**: Built for horizontal scaling on Google Cloud Run.
+- **Robust Testing**: Comprehensive Pytest suite covering backend core AI integration logic.

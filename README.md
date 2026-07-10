@@ -122,9 +122,39 @@ App available at `http://localhost:3000`.
 
 ---
 
+## ☁️ Google Cloud Run Deployment
+
+To deploy this project to Google Cloud Run, ensure you have the `gcloud` CLI installed and authenticated.
+
+### 1. Deploy the Backend
+Deploy the FastAPI backend first to get your API URL.
+```bash
+cd backend
+gcloud run deploy crowdpilot-backend \
+  --source . \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --set-env-vars GCP_PROJECT_ID="your-google-cloud-project-id" \
+  --set-env-vars GCP_LOCATION="us-central1"
+```
+*Note the Service URL provided upon successful deployment (e.g., `https://crowdpilot-backend-xxxxx-uc.a.run.app`).*
+
+### 2. Deploy the Frontend
+Deploy the Next.js frontend, injecting the backend URL you just received.
+```bash
+cd ../frontend
+gcloud run deploy crowdpilot-frontend \
+  --source . \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --set-env-vars NEXT_PUBLIC_API_URL="https://crowdpilot-backend-xxxxx-uc.a.run.app" 
+```
+
+---
+
 ## 📸 Screenshots
 
-*(To be added by the user prior to submission. Recommended screenshots: The main dashboard with the Decision Timeline, the live Heatmap, and the AI Incident Copilot).*
+*(Replace this section with screenshots of your live application before submission)*
 
 ---
 
