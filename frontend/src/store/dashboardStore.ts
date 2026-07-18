@@ -18,7 +18,7 @@ export const useDashboardStore = create<DashboardStore>((set) => ({
       if (state.recommendations.some((r) => (r.id || r.observation) === recId)) {
         return state;
       }
-      return { recommendations: [newRec, ...state.recommendations.slice(0, 4)] };
+      return { recommendations: [newRec, ...state.recommendations.slice(0, 19)] };
     }),
   stadiumState: null,
   setStadiumState: (stadiumState) => set({ stadiumState }),
