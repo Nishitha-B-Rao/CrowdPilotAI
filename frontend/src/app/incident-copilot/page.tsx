@@ -6,7 +6,7 @@ import { useState } from "react";
 import { Upload } from "lucide-react";
 import { useIncidentStore } from "@/store/incidentStore";
 
-import type { IncidentItem } from "@/lib/types";
+
 
 export default function IncidentCopilot() {
   const incidents = useIncidentStore((state) => state.incidents);

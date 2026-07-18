@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, AlertTriangle, BarChart3, DollarSign } from "lucide-react";
+import { LayoutDashboard, AlertTriangle, BarChart3 } from "lucide-react";
 
 export function Sidebar() {
   const [isDark, setIsDark] = useState(true);

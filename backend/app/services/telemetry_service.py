@@ -1,7 +1,7 @@
 import random
 from typing import List
 
-from app.models.telemetry import Gate, StadiumState, CostMetrics
+from app.models.telemetry import Gate, StadiumState
 
 
 class TelemetryService:
@@ -16,11 +16,6 @@ class TelemetryService:
         ]
         self.total_occupancy = 68402
         self.active_incidents = 3
-        self.cost_metrics = CostMetrics(
-            ai_routing_savings_usd=4250,
-            overtime_prevented_hours=18,
-            resource_efficiency_percentage=94
-        )
         self.ai_logs = []
 
     def generate_live_state(self) -> StadiumState:
@@ -46,6 +41,5 @@ class TelemetryService:
             total_occupancy=self.total_occupancy,
             active_incidents=self.active_incidents,
             avg_queue_time=avg_queue,
-            gates=self.gates,
-            cost_metrics=self.cost_metrics
+            gates=self.gates
         )

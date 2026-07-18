@@ -81,7 +81,7 @@ class AIService:
 
         try:
             response = self.client.models.generate_content(
-                model='gemini-2.5-flash-8b',
+                model='gemini-2.5-flash',
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
@@ -142,14 +142,21 @@ class AIService:
             
         try:
             response = self.client.models.generate_content(
-                model='gemini-2.5-flash-8b',
+                model='gemini-2.5-flash',
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
                 ),
             )
-            return json.loads(response.text)
+            text = response.text.strip()
+            if text.startswith("```json"):
+                text = text[7:-3].strip()
+            elif text.startswith("```"):
+                text = text[3:-3].strip()
+                
+            return json.loads(text)
         except Exception as e:
+            logger.error(f"Error in translate_text: {e}")
             return {
                 "originalText": text,
                 "translatedText": f"Translation failed: {str(e)[:50]}",
@@ -218,7 +225,7 @@ class AIService:
 
         try:
             response = self.client.models.generate_content(
-                model='gemini-2.5-flash-8b',
+                model='gemini-2.5-flash',
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",

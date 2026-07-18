@@ -50,31 +50,10 @@ class DataProcessingService:
             raise HTTPException(status_code=400, detail="CSV contained no valid gate data.")
 
         avg_queue = sum(g.queue_time_minutes for g in gates) // len(gates)
-
-        # Dynamic Cost Metrics Calculation
-        # Assume gates > 80% occupancy contribute to queue delays that can be avoided
-        high_occupancy_gates = [g for g in gates if g.occupancy_percentage > 80]
-        redirected_people = sum((g.occupancy_percentage - 80) * 200 for g in high_occupancy_gates)
-        
-        # Assume each redirected person saves 0.05 minutes of average queue time globally
-        queue_reduction_minutes = int(redirected_people * 0.05)
-        
-        # Assume 1 hour of queue time saved equates to 0.5 hours of volunteer overtime saved
-        overtime_saved_hours = int((queue_reduction_minutes / 60) * 0.5)
-        
-        # Assume volunteer overtime costs $25/hr
-        cost_savings_usd = overtime_saved_hours * 25
-
-        # Base efficiency is 85%, plus 1% for every 100 people effectively redirected
-        efficiency = min(99, 85 + int(redirected_people / 100))
-
         # Update the live telemetry service
         telemetry = get_telemetry_service()
         telemetry.gates = gates
         telemetry.total_occupancy = total_occupancy
         telemetry.active_incidents = getattr(telemetry, 'active_incidents', 0)
-        telemetry.cost_metrics.ai_routing_savings_usd = cost_savings_usd
-        telemetry.cost_metrics.overtime_prevented_hours = overtime_saved_hours
-        telemetry.cost_metrics.resource_efficiency_percentage = efficiency
         
         return telemetry.generate_live_state()

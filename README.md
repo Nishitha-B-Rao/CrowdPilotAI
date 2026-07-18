@@ -85,4 +85,4 @@ The frontend is built with an unwavering commitment to Accessibility (a911y), ac
 Reliability is critical for life-safety systems. Please see our dedicated [TESTING.md](TESTING.md) guide for full instructions on running the test suites.
 - **Backend (Pytest):** Comprehensive coverage of FastAPI endpoints, data processing, and mock Vertex AI inference.
 - **Frontend (Vitest):** Component-level unit testing for the React layer.
-- **Performance & Efficiency:** For a full breakdown of how we achieved top-tier scores in Code Quality and Efficiency, please see our dedicated [OPTIMIZATIONS.md](OPTIMIZATIONS.md) document.
+- **Performance & Efficiency:** For a full breakdown of our architectural optimizations, please see our dedicated [OPTIMIZATIONS.md](OPTIMIZATIONS.md) document.

@@ -4,7 +4,7 @@ import { API_URL } from "@/lib/config";
 import { useState, useEffect, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useDashboardStore } from "@/store/dashboardStore";
-import type { StadiumState, Recommendation, AILogEntry } from "@/lib/types";
+import type { StadiumState, AILogEntry } from "@/lib/types";
 
 // Dynamic imports for heavy components
 const CsvUploader = dynamic(() => import("@/components/CsvUploader").then(mod => mod.CsvUploader), { ssr: false });
@@ -17,6 +17,7 @@ const AILog = dynamic(() => import("@/components/AILog").then(mod => mod.AILog))
 export default function DashboardClient() {
   const recommendations = useDashboardStore((state) => state.recommendations);
   const addRecommendation = useDashboardStore((state) => state.addRecommendation);
+
   const [stadiumState, setStadiumState] = useState<StadiumState | null>(null);
   const [aiLogs, setAiLogs] = useState<AILogEntry[]>([]);
 
@@ -28,6 +29,7 @@ export default function DashboardClient() {
       const data = await syncRes.json();
       
       setStadiumState(data.state);
+
       setAiLogs(data.ai_logs || []);
       
       if (data.recommendation) {
@@ -41,7 +43,7 @@ export default function DashboardClient() {
     } catch (err) {
       console.error("Failed to fetch dashboard data:", err);
     }
-  }, []);
+  }, [addRecommendation]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect

@@ -26,7 +26,7 @@ The Service layer (`app/services/`) contains the core orchestration logic.
   - `AIService`: Manages prompt engineering, RAG context injection, and structured JSON parsing from the Gemini API.
 
 ### 4. Data / Repository Layer
-The architecture is designed to support a Repository layer for abstracting database storage, though for this hackathon prototype, data state is managed in-memory or via streaming CSVs to focus on real-time GenAI orchestration.
+The architecture is designed to support a Repository layer for abstracting database storage, though for this prototype, data state is managed in-memory or via streaming CSVs to focus on real-time GenAI orchestration.
 - **Key Components:**
   - `DataProcessingService`: Handles the ingestion, parsing, and streaming of operational files (crowd density, incident reports).
 
@@ -45,7 +45,7 @@ The architecture is designed to support a Repository layer for abstracting datab
 - **Framework:** FastAPI (Python 3.11)
 - **Server:** Uvicorn
 - **Validation:** Pydantic v2
-- **AI Integration:** Google GenAI SDK (`gemini-2.5-flash`)
+- **AI Integration:** Google GenAI SDK (`gemini-2.5-flash-8b`)
 - **Data Processing:** Pandas (for analytics and CSV processing)
 - **Testing:** Pytest, FastAPI TestClient
 

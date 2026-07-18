@@ -40,8 +40,8 @@ export function CsvUploader({ onUploadSuccess }: CsvUploaderProps) {
       setStatus("success");
       onUploadSuccess(); // Trigger a refresh in the parent component
       
-      // Reset status after a few seconds
-      setTimeout(() => setStatus("idle"), 3000);
+      // Reset status immediately so user isn't waiting
+      setTimeout(() => setStatus("idle"), 500);
     } catch (err: unknown) {
       console.error(err);
       setStatus("error");
