@@ -1,10 +1,9 @@
 "use client";
 
 import { API_URL } from "@/lib/config";
-import { useState, useEffect, useCallback } from "react";
+import { useEffect, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useDashboardStore } from "@/store/dashboardStore";
-import type { StadiumState, AILogEntry } from "@/lib/types";
 
 // Dynamic imports for heavy components
 const CsvUploader = dynamic(() => import("@/components/CsvUploader").then(mod => mod.CsvUploader), { ssr: false });
@@ -17,9 +16,10 @@ const AILog = dynamic(() => import("@/components/AILog").then(mod => mod.AILog))
 export default function DashboardClient() {
   const recommendations = useDashboardStore((state) => state.recommendations);
   const addRecommendation = useDashboardStore((state) => state.addRecommendation);
-
-  const [stadiumState, setStadiumState] = useState<StadiumState | null>(null);
-  const [aiLogs, setAiLogs] = useState<AILogEntry[]>([]);
+  const stadiumState = useDashboardStore((state) => state.stadiumState);
+  const setStadiumState = useDashboardStore((state) => state.setStadiumState);
+  const aiLogs = useDashboardStore((state) => state.aiLogs);
+  const setAiLogs = useDashboardStore((state) => state.setAiLogs);
 
   const fetchData = useCallback(async () => {
     try {
@@ -43,10 +43,9 @@ export default function DashboardClient() {
     } catch (err) {
       console.error("Failed to fetch dashboard data:", err);
     }
-  }, [addRecommendation]);
+  }, [addRecommendation, setStadiumState, setAiLogs]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchData();
     const interval = setInterval(fetchData, 10000);
 

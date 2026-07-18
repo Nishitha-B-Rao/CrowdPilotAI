@@ -1,9 +1,13 @@
 import { create } from 'zustand';
-import type { Recommendation } from '@/lib/types';
+import type { Recommendation, StadiumState, AILogEntry } from '@/lib/types';
 
 interface DashboardStore {
   recommendations: Recommendation[];
   addRecommendation: (rec: Recommendation) => void;
+  stadiumState: StadiumState | null;
+  setStadiumState: (state: StadiumState | null) => void;
+  aiLogs: AILogEntry[];
+  setAiLogs: (logs: AILogEntry[]) => void;
 }
 
 export const useDashboardStore = create<DashboardStore>((set) => ({
@@ -16,4 +20,8 @@ export const useDashboardStore = create<DashboardStore>((set) => ({
       }
       return { recommendations: [newRec, ...state.recommendations.slice(0, 4)] };
     }),
+  stadiumState: null,
+  setStadiumState: (stadiumState) => set({ stadiumState }),
+  aiLogs: [],
+  setAiLogs: (aiLogs) => set({ aiLogs }),
 }));
