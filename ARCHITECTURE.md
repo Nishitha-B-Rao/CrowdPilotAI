@@ -5,7 +5,7 @@
 CrowdPilot AI is built using a strict **Clean Architecture** pattern to ensure maximum scalability, testability, and separation of concerns. The system is divided into decoupled layers.
 
 ### 1. Presentation Layer (Frontend)
-The frontend is a strictly typed Next.js application that communicates with the backend via REST APIs. 
+The frontend is a strictly typed Next.js application leveraging the App Router. It uses **Server Components** for initial payload efficiency and lazy-loads interactive elements via `next/dynamic` to ensure rapid time-to-interactive.
 - **Role:** Handles UI rendering, state management, and real-time data visualization.
 - **Key Components:**
   - `Decision Timeline`: Renders the complex Explainable AI (XAI) JSON responses into an intuitive, expandable timeline.
@@ -15,7 +15,8 @@ The frontend is a strictly typed Next.js application that communicates with the 
 The FastAPI routing layer (`app/api/`) exposes RESTful endpoints.
 - **Role:** Handles HTTP requests, validates incoming payloads (using Pydantic), and routes them to the appropriate services. 
 - **Key Components:**
-  - `copilot.py`: Endpoints for XAI recommendations and incident reporting.
+  - `dashboard.py`: Exposes a single, highly-efficient `/sync` endpoint that aggregates telemetry, AI logs, and real-time recommendations to drastically reduce network calls.
+  - `copilot.py`: Asynchronous (`async def`) endpoints for XAI recommendations and incident reporting.
   - `deps.py`: Manages Dependency Injection for services and repositories.
 
 ### 3. Business Logic Layer

@@ -1,6 +1,6 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import AnalyticsPage from "@/app/analytics/page";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 
 // Mock resize observer for Recharts
 global.ResizeObserver = class ResizeObserver {

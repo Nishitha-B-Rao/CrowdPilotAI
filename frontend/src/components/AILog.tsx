@@ -9,7 +9,7 @@ interface AILogProps {
 
 export const AILog = memo(function AILog({ aiLogs }: AILogProps) {
   return (
-    <div className="glass-panel p-6 rounded-2xl border border-white/10 relative overflow-hidden flex flex-col min-h-[250px] mt-6">
+    <div className="glass-panel p-6 rounded-2xl border border-white/10 relative overflow-hidden flex flex-col min-h-[250px]">
       <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent pointer-events-none"></div>
       
       <div className="flex justify-between items-center mb-6 relative z-10">

@@ -33,16 +33,12 @@ These modules are 100% functional, wired to the backend, and powered by Google C
 
 These modules demonstrate the long-term vision, commercial viability, and UI/UX capability of the product. By uploading operational CSV files, these modules compute dynamic metrics and generate real AI insights, rather than relying on hardcoded static data.
 
-### A. Cost Optimization Dashboard
-* **Location**: Sidebar -> Cost Dashboard (`/cost-dashboard`)
-* **Purpose**: Demonstrates the commercial viability of the platform to stakeholders. It dynamically visualizes AI Routing Savings, Overtime Prevented, and Resource Efficiency based on the live crowd telemetry.
-
-### B. Incident Copilot & Decision Timeline
+### A. Incident Copilot & Decision Timeline
 * **Location**: Sidebar -> Incident Copilot (`/incident-copilot`)
 * **Purpose**: A dedicated view for handling emergencies (Medical, Security). 
 * **How it works**: Upload any file from `mock_data/incidents_*.csv` to seamlessly pass real-time incident reports to Vertex AI, which assigns priorities, generates reasoning, and provides dispatch action scripts dynamically.
 
-### C. Live Heatmap Analytics
+### B. Live Heatmap Analytics
 * **Location**: Main Dashboard & Analytics Page (`/analytics`)
 * **Purpose**: Visually represents stadium density.
 * **Status**: Dynamic generation based on telemetry data.

@@ -44,7 +44,7 @@ async def get_recommendation(
         raise HTTPException(status_code=500, detail=f"Failed to generate recommendation: {str(e)}")
 
 @router.post("/translate", response_model=TranslateResponse)
-def translate_text(
+async def translate_text(
     request: TranslateRequest,
     ai_service: AIService = Depends(get_ai_service),
     telemetry_service: TelemetryService = Depends(get_telemetry_service)

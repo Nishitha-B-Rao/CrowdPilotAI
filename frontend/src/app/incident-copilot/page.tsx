@@ -4,9 +4,13 @@ import { API_URL } from "@/lib/config";
 
 import { useState } from "react";
 import { Upload } from "lucide-react";
+import { useIncidentStore } from "@/store/incidentStore";
+
+import type { IncidentItem } from "@/lib/types";
 
 export default function IncidentCopilot() {
-  const [incidents, setIncidents] = useState<any[]>([]);
+  const incidents = useIncidentStore((state) => state.incidents);
+  const setIncidents = useIncidentStore((state) => state.setIncidents);
   const [loading, setLoading] = useState(false);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,10 +28,20 @@ export default function IncidentCopilot() {
       
       if (res.ok) {
         const data = await res.json();
+        
+        // If AI returns an empty array, it might have failed internally
+        if (data.incidents && data.incidents.length === 0) {
+          alert("AI failed to process incidents. Please check the backend console for API errors.");
+        }
+        
         setIncidents(data.incidents || []);
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.detail || "Server returned an error");
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Failed to upload incidents", err);
+      alert(`Failed to upload incidents: ${(err as Error).message}`);
     } finally {
       setLoading(false);
     }
@@ -81,7 +95,7 @@ export default function IncidentCopilot() {
                   <p><span className="text-cyan-400 font-semibold text-xs uppercase tracking-wider">AI Reasoning:</span> <span className="text-white/80">{inc.reasoning}</span></p>
                   <p><span className="text-cyan-400 font-semibold text-xs uppercase tracking-wider">Recommended Action:</span> <span className="text-white/80">{inc.response}</span></p>
                   {inc.announcement !== "N/A" && (
-                    <p><span className="text-cyan-400 font-semibold text-xs uppercase tracking-wider">Public Announcement:</span> <span className="text-white/80 italic">"{inc.announcement}"</span></p>
+                    <p><span className="text-cyan-400 font-semibold text-xs uppercase tracking-wider">Public Announcement:</span> <span className="text-white/80 italic">&quot;{inc.announcement}&quot;</span></p>
                   )}
                 </div>
               </div>

@@ -84,9 +84,16 @@ class AIService:
                     response_mime_type="application/json",
                 ),
             )
-            response_dict = json.loads(response.text)
+            text = response.text.strip()
+            if text.startswith("```json"):
+                text = text[7:-3].strip()
+            elif text.startswith("```"):
+                text = text[3:-3].strip()
+                
+            response_dict = json.loads(text)
             return AIRecommendation(**response_dict)
         except Exception as e:
+            print(f"Error in generate_recommendation: {e}")
             # Fallback if API fails (e.g. 429 Rate Limit)
             return AIRecommendation(
                 observation="Live Telemetry captured, but AI Analysis is temporarily rate-limited.",
@@ -214,8 +221,15 @@ class AIService:
                     response_mime_type="application/json",
                 ),
             )
-            return json.loads(response.text)
+            text = response.text.strip()
+            if text.startswith("```json"):
+                text = text[7:-3].strip()
+            elif text.startswith("```"):
+                text = text[3:-3].strip()
+                
+            return json.loads(text)
         except Exception as e:
+            print(f"Error in process_incidents: {e}")
             return {
                 "incidents": []
             }

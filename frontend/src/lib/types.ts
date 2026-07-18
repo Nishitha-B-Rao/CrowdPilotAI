@@ -33,3 +33,13 @@ export type StadiumState = {
   avg_queue_time: number;
   gates: Gate[];
 };
+
+export type IncidentItem = {
+  time: string;
+  incident: string;
+  gate: string;
+  priority: string;
+  reasoning: string;
+  response: string;
+  announcement: string;
+};

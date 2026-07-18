@@ -52,10 +52,10 @@ export const Translation = memo(function Translation() {
                 </span>
               )}
             </div>
-            <p className="text-sm font-medium text-white/90 mb-2 italic">"{translationData.originalText}"</p>
+            <p className="text-sm font-medium text-white/90 mb-2 italic">&quot;{translationData.originalText}&quot;</p>
             <div className="w-full h-px bg-white/10 my-2"></div>
             <span className="text-xs font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 mb-2">English Translation</span>
-            <p className="text-sm font-bold text-emerald-400">"{translationData.translatedText}"</p>
+            <p className="text-sm font-bold text-emerald-400">&quot;{translationData.translatedText}&quot;</p>
             <button 
               onClick={() => setTranslationData(null)}
               className="mt-4 text-xs text-muted-foreground hover:text-cyan-500 underline transition-colors"
@@ -77,13 +77,15 @@ export const Translation = memo(function Translation() {
                   
                   // Web Speech API Integration
                   try {
-                    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const SpeechRecognition = (window as unknown as { SpeechRecognition: new () => any }).SpeechRecognition || (window as unknown as { webkitSpeechRecognition: new () => any }).webkitSpeechRecognition;
                     if (SpeechRecognition) {
                       const recognition = new SpeechRecognition();
                       recognition.lang = 'es-ES'; // Listen for Spanish or default
                       recognition.interimResults = false;
                       recognition.maxAlternatives = 1;
                       
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
                       recognition.onresult = async (event: any) => {
                         const transcript = event.results[0][0].transcript;
                         setIsListening(false);
@@ -111,6 +113,7 @@ export const Translation = memo(function Translation() {
                         }
                       };
                       
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
                       recognition.onerror = (event: any) => {
                         console.error('Speech recognition error', event.error);
                         setIsListening(false);
@@ -139,7 +142,7 @@ export const Translation = memo(function Translation() {
                           detectedLanguage: "Error"
                       });
                     }
-                  } catch (e) {
+                  } catch {
                     setIsListening(false);
                     setTranslationData({
                         originalText: "",

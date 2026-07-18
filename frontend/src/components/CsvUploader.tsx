@@ -42,10 +42,10 @@ export function CsvUploader({ onUploadSuccess }: CsvUploaderProps) {
       
       // Reset status after a few seconds
       setTimeout(() => setStatus("idle"), 3000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
       setStatus("error");
-      setErrorMessage(err.message || "Failed to process CSV");
+      setErrorMessage((err as Error).message || "Failed to process CSV");
     } finally {
       setIsUploading(false);
       // Reset the input

@@ -59,12 +59,6 @@ export function Sidebar() {
               Analytics
             </Link>
           </li>
-          <li>
-            <Link href="/cost-dashboard" className={getLinkClasses("/cost-dashboard")}>
-              <DollarSign size={18} className={getIconClasses("/cost-dashboard")} />
-              Cost Dashboard
-            </Link>
-          </li>
         </ul>
       </nav>
 

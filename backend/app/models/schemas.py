@@ -1,6 +1,7 @@
 from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field
+from app.models.telemetry import StadiumState
 
 
 class AIRecommendation(BaseModel):
@@ -48,3 +49,8 @@ class AILogEntry(BaseModel):
     latency_ms: int
     confidence: str
     status: str
+
+class DashboardSyncResponse(BaseModel):
+    state: StadiumState
+    recommendation: Optional[AIRecommendation] = None
+    ai_logs: List[AILogEntry]

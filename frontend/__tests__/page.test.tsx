@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import Dashboard from "@/app/page";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
@@ -43,7 +43,8 @@ describe("Frontend Dashboard Tests", () => {
 
   it("should interact with the Translation Module", async () => {
     render(<Dashboard />);
-    const micButton = screen.getByRole("button", { name: "" }); // Find by role if possible, or by class
+    const micButton = screen.getByLabelText(/start recording/i);
+    expect(micButton).toBeDefined();
     // We will just verify it mounts for now to fulfill the testing domain requirement
     expect(screen.getByText(/Live Operations/i)).toBeInTheDocument();
   });
