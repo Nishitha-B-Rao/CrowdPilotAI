@@ -34,7 +34,7 @@ export const DecisionTimeline = memo(function DecisionTimeline({ recommendations
         </div>
       </div>
 
-      <div className="flex-1 space-y-6">
+      <div className="flex-1 space-y-6 max-h-[600px] overflow-y-auto pr-2 pb-4 scrollbar-thin scrollbar-thumb-cyan-500/30 scrollbar-track-transparent">
         <AnimatePresence>
           {recommendations.map((rec) => (
             <motion.div 

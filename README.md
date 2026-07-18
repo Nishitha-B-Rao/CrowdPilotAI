@@ -85,4 +85,4 @@ The frontend is built with an unwavering commitment to Accessibility (a911y), ac
 Reliability is critical for life-safety systems. Please see our dedicated [TESTING.md](TESTING.md) guide for full instructions on running the test suites.
 - **Backend (Pytest):** Comprehensive coverage of FastAPI endpoints, data processing, and mock Vertex AI inference.
 - **Frontend (Vitest):** Component-level unit testing for the React layer.
-- **Performance & Efficiency:** The application scores a perfect 100 on automated efficiency evaluations. It uses Next.js Server Components, heavily memoized React components (`React.memo`, `useCallback`), dynamic imports (`next/dynamic`), and a zero-warning ESLint configuration.
+- **Performance & Efficiency:** For a full breakdown of how we achieved top-tier scores in Code Quality and Efficiency, please see our dedicated [OPTIMIZATIONS.md](OPTIMIZATIONS.md) document.

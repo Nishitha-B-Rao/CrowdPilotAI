@@ -3,6 +3,7 @@
 import { API_URL } from "@/lib/config";
 import { useState, useEffect, useCallback } from "react";
 import dynamic from "next/dynamic";
+import { useDashboardStore } from "@/store/dashboardStore";
 import type { StadiumState, Recommendation, AILogEntry } from "@/lib/types";
 
 // Dynamic imports for heavy components
@@ -14,7 +15,8 @@ const Translation = dynamic(() => import("@/components/Translation").then(mod =>
 const AILog = dynamic(() => import("@/components/AILog").then(mod => mod.AILog));
 
 export default function DashboardClient() {
-  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const recommendations = useDashboardStore((state) => state.recommendations);
+  const addRecommendation = useDashboardStore((state) => state.addRecommendation);
   const [stadiumState, setStadiumState] = useState<StadiumState | null>(null);
   const [aiLogs, setAiLogs] = useState<AILogEntry[]>([]);
 
@@ -29,18 +31,12 @@ export default function DashboardClient() {
       setAiLogs(data.ai_logs || []);
       
       if (data.recommendation) {
-        setRecommendations(prev => {
-          // Use observation as unique ID if not provided
-          const recId = data.recommendation.id || data.recommendation.observation;
-          if (prev.some(r => (r.id || r.observation) === recId)) return prev;
-          
-          const newRec = {
-            ...data.recommendation,
-            id: recId,
-            timestamp: data.recommendation.timestamp || new Date().toLocaleTimeString()
-          };
-          return [newRec, ...prev.slice(0, 4)];
-        });
+        const newRec = {
+          ...data.recommendation,
+          id: data.recommendation.id || data.recommendation.observation,
+          timestamp: data.recommendation.timestamp || new Date().toLocaleTimeString()
+        };
+        addRecommendation(newRec);
       }
     } catch (err) {
       console.error("Failed to fetch dashboard data:", err);

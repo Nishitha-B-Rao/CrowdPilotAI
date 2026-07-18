@@ -2,6 +2,9 @@ import json
 import csv
 import io
 from typing import Optional
+import logging
+
+logger = logging.getLogger(__name__)
 
 from google import genai
 from google.genai import types
@@ -78,7 +81,7 @@ class AIService:
 
         try:
             response = self.client.models.generate_content(
-                model='gemini-2.5-flash',
+                model='gemini-2.5-flash-8b',
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
@@ -93,7 +96,7 @@ class AIService:
             response_dict = json.loads(text)
             return AIRecommendation(**response_dict)
         except Exception as e:
-            print(f"Error in generate_recommendation: {e}")
+            logger.error(f"Error in generate_recommendation: {e}")
             # Fallback if API fails (e.g. 429 Rate Limit)
             return AIRecommendation(
                 observation="Live Telemetry captured, but AI Analysis is temporarily rate-limited.",
@@ -139,7 +142,7 @@ class AIService:
             
         try:
             response = self.client.models.generate_content(
-                model='gemini-2.5-flash',
+                model='gemini-2.5-flash-8b',
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
@@ -215,7 +218,7 @@ class AIService:
 
         try:
             response = self.client.models.generate_content(
-                model='gemini-2.5-flash',
+                model='gemini-2.5-flash-8b',
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
@@ -229,7 +232,7 @@ class AIService:
                 
             return json.loads(text)
         except Exception as e:
-            print(f"Error in process_incidents: {e}")
+            logger.error(f"Error in process_incidents: {e}")
             return {
                 "incidents": []
             }

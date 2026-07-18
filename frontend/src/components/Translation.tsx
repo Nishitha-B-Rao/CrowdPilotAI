@@ -1,14 +1,15 @@
 "use client";
 
-import React, { useState, memo } from "react";
+import React, { useState, useRef, memo } from "react";
 import { motion } from "framer-motion";
-import { Mic } from "lucide-react";
+import { Mic, Square } from "lucide-react";
 import { API_URL } from "@/lib/config";
 
 export const Translation = memo(function Translation() {
   const [isListening, setIsListening] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
   const [translationData, setTranslationData] = useState<{originalText: string, translatedText: string, detectedLanguage: string, confidence?: string} | null>(null);
+  const recognitionRef = useRef<any>(null);
 
   return (
     <div className="glass rounded-2xl p-6 relative overflow-hidden">
@@ -25,19 +26,30 @@ export const Translation = memo(function Translation() {
       <div className="glass-panel rounded-xl p-6 border border-white/5 flex flex-col justify-center items-center text-center relative z-10 group min-h-[200px]">
         
         {isListening ? (
-          <div aria-live="polite" className="flex flex-col items-center justify-center animate-in fade-in zoom-in duration-300">
-            <div className="flex space-x-1 mb-6">
-              {[1,2,3,4,5].map((i) => (
-                <motion.div
-                  key={i}
-                  className="w-1.5 bg-cyan-400 rounded-full"
-                  animate={{ height: ["10px", "30px", "10px"] }}
-                  transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.1 }}
-                />
-              ))}
+            <div aria-live="polite" className="flex flex-col items-center justify-center animate-in fade-in zoom-in duration-300">
+              <div className="flex space-x-1 mb-6">
+                {[1,2,3,4,5].map((i) => (
+                  <motion.div
+                    key={i}
+                    className="w-1.5 bg-cyan-400 rounded-full"
+                    animate={{ height: ["10px", "30px", "10px"] }}
+                    transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.1 }}
+                  />
+                ))}
+              </div>
+              <p className="text-sm text-cyan-400 font-medium animate-pulse mb-3">Listening to microphone...</p>
+              <button 
+                onClick={() => {
+                  if (recognitionRef.current) {
+                    recognitionRef.current.stop();
+                  }
+                }}
+                className="flex items-center space-x-1 px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-full text-xs font-bold transition-colors border border-red-500/30"
+              >
+                <Square size={12} fill="currentColor" />
+                <span>Stop</span>
+              </button>
             </div>
-            <p className="text-sm text-cyan-400 font-medium animate-pulse">Listening to microphone...</p>
-          </div>
         ) : isTranslating ? (
           <div aria-live="polite" className="flex flex-col items-center justify-center animate-in fade-in zoom-in duration-300">
             <p className="text-sm text-cyan-400 font-medium animate-pulse">Translating with Vertex AI...</p>
@@ -81,6 +93,7 @@ export const Translation = memo(function Translation() {
                     const SpeechRecognition = (window as unknown as { SpeechRecognition: new () => any }).SpeechRecognition || (window as unknown as { webkitSpeechRecognition: new () => any }).webkitSpeechRecognition;
                     if (SpeechRecognition) {
                       const recognition = new SpeechRecognition();
+                      recognitionRef.current = recognition;
                       recognition.lang = 'es-ES'; // Listen for Spanish or default
                       recognition.interimResults = false;
                       recognition.maxAlternatives = 1;

@@ -10,7 +10,7 @@ interface HeatmapProps {
 
 export const Heatmap = memo(function Heatmap({ stadiumState }: HeatmapProps) {
   return (
-    <div className="glass rounded-2xl p-6 flex-1 flex flex-col min-h-[350px]">
+    <div className="glass rounded-2xl p-6 flex flex-col h-[350px]">
       <h3 className="font-bold tracking-tight text-white mb-4 flex items-center">
         <Activity size={18} className="mr-2 text-primary" /> Live Heatmap
       </h3>
