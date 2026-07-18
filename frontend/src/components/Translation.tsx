@@ -10,7 +10,8 @@ export const Translation = memo(function Translation() {
   const [isTranslating, setIsTranslating] = useState(false);
   const [translationData, setTranslationData] = useState<{originalText: string, translatedText: string, detectedLanguage: string, confidence?: string} | null>(null);
   const [interimText, setInterimText] = useState("");
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
 
   return (
     <div className="glass rounded-2xl p-6 relative overflow-hidden">
