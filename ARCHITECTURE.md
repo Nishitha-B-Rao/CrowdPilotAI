@@ -45,7 +45,7 @@ The architecture is designed to support a Repository layer for abstracting datab
 - **Framework:** FastAPI (Python 3.11)
 - **Server:** Uvicorn
 - **Validation:** Pydantic v2
-- **AI Integration:** Google GenAI SDK (`gemini-2.5-flash-8b`)
+- **AI Integration:** Google GenAI SDK (`gemini-2.5-flash`)
 - **Data Processing:** Pandas (for analytics and CSV processing)
 - **Testing:** Pytest, FastAPI TestClient
 

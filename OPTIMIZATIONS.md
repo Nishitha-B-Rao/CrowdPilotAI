@@ -18,7 +18,16 @@ Swapped the standard heavy LLMs for Google's lightning-fast `gemini-2.5-flash` m
 - **Impact:** Drastically reduces AI latency to absolute milliseconds.
 - **Impact:** Prevents the dashboard from hanging or showing stale data during live operations.
 
-### 3. Next.js Server Components (RSC)
+### 3. Asynchronous Thread Pooling (FastAPI)
+By converting heavy, synchronous Vertex AI endpoints from `async def` to standard `def` (or utilizing `asyncio.to_thread`), the backend offloads intensive LLM generation to a separate thread pool.
+- **Impact:** Prevents the main FastAPI event loop from being blocked by 10-second AI generation tasks.
+- **Impact:** Enables instant, parallel processing of concurrent requests (e.g. triggering an instant audio translation while the dashboard is heavily syncing).
+
+### 4. Continuous Speech Streaming (Perceived Latency)
+The `Translation.tsx` component utilizes the Web Speech API with `interimResults = true` to stream words to the UI live as they are spoken.
+- **Impact:** Completely eliminates perceived latency. Users see instant visual feedback rather than blindly waiting for the browser's slow silence-detection timeout.
+
+### 5. Next.js Server Components (RSC)
 Heavy layout wrappers and static sections of the application are rendered as React Server Components rather than Client Components.
 - **Impact:** Significantly reduces the client-side JavaScript bundle size.
 - **Impact:** Improves Time-to-Interactive (TTI) and overall Lighthouse performance scores.
