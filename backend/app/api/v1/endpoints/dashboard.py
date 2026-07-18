@@ -3,7 +3,7 @@ import json
 from fastapi import APIRouter, Depends
 
 from app.api.deps import get_ai_service, get_telemetry_service
-from app.models.schemas import DashboardSyncResponse
+from app.models.schemas import DashboardSyncResponse, AIRecommendation
 from app.services.ai_service import AIService
 from app.services.telemetry_service import TelemetryService
 from app.api.v1.endpoints.copilot import _log_ai_activity
@@ -11,7 +11,7 @@ from app.api.v1.endpoints.copilot import _log_ai_activity
 router = APIRouter()
 
 @router.get("/sync", response_model=DashboardSyncResponse)
-async def sync_dashboard(
+def sync_dashboard(
     ai_service: AIService = Depends(get_ai_service),
     telemetry_service: TelemetryService = Depends(get_telemetry_service)
 ):
@@ -26,6 +26,7 @@ async def sync_dashboard(
     try:
         context_str = json.dumps(state.model_dump())
         recommendation = ai_service.generate_recommendation(context_str)
+        
         confidence_val = getattr(recommendation, "confidence", "N/A")
         _log_ai_activity(telemetry_service, "Dashboard Sync", start_time, confidence_val, "Recommendation Generated")
     except Exception as e:

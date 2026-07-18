@@ -9,6 +9,7 @@ export const Translation = memo(function Translation() {
   const [isListening, setIsListening] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
   const [translationData, setTranslationData] = useState<{originalText: string, translatedText: string, detectedLanguage: string, confidence?: string} | null>(null);
+  const [interimText, setInterimText] = useState("");
   const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   return (
@@ -37,7 +38,11 @@ export const Translation = memo(function Translation() {
                   />
                 ))}
               </div>
-              <p className="text-sm text-cyan-400 font-medium animate-pulse mb-3">Listening to microphone...</p>
+              <p className="text-sm text-cyan-400 font-medium animate-pulse mb-2">Listening...</p>
+              
+              <div className="min-h-[40px] px-2 mb-4 w-full flex items-center justify-center text-center italic text-white/80 text-sm break-words">
+                {interimText || "..."}
+              </div>
               <button 
                 onClick={() => {
                   if (recognitionRef.current) {
@@ -95,34 +100,51 @@ export const Translation = memo(function Translation() {
                       const recognition = new SpeechRecognition();
                       recognitionRef.current = recognition;
                       recognition.lang = 'es-ES'; // Listen for Spanish or default
-                      recognition.interimResults = false;
+                      recognition.interimResults = true;
                       recognition.maxAlternatives = 1;
                       
                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                       recognition.onresult = async (event: any) => {
-                        const transcript = event.results[0][0].transcript;
-                        setIsListening(false);
-                        setIsTranslating(true);
+                        let finalTranscript = "";
+                        let currentInterim = "";
                         
-                        try {
-                          const res = await fetch(`${API_URL}/api/v1/copilot/translate`, {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ text: transcript })
-                          });
+                        for (let i = event.resultIndex; i < event.results.length; ++i) {
+                          if (event.results[i].isFinal) {
+                            finalTranscript += event.results[i][0].transcript;
+                          } else {
+                            currentInterim += event.results[i][0].transcript;
+                          }
+                        }
+                        
+                        if (currentInterim) {
+                          setInterimText(currentInterim);
+                        }
+                        
+                        if (finalTranscript) {
+                          setIsListening(false);
+                          setInterimText("");
+                          setIsTranslating(true);
                           
-                          if (!res.ok) throw new Error("Translation failed");
-                          const data = await res.json();
-                          setTranslationData(data);
-                        } catch (err) {
-                          console.error(err);
-                          setTranslationData({
-                            originalText: transcript,
-                            translatedText: "API Error: Could not reach translation service.",
-                            detectedLanguage: "Error"
-                          });
-                        } finally {
-                          setIsTranslating(false);
+                          try {
+                            const res = await fetch(`${API_URL}/api/v1/copilot/translate`, {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ text: finalTranscript })
+                            });
+                            
+                            if (!res.ok) throw new Error("Translation failed");
+                            const data = await res.json();
+                            setTranslationData(data);
+                          } catch (err) {
+                            console.error(err);
+                            setTranslationData({
+                              originalText: finalTranscript,
+                              translatedText: "API Error: Could not reach translation service.",
+                              detectedLanguage: "Error"
+                            });
+                          } finally {
+                            setIsTranslating(false);
+                          }
                         }
                       };
                       

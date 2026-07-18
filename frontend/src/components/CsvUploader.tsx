@@ -5,6 +5,7 @@ import { API_URL } from "@/lib/config";
 import { useState } from "react";
 import { UploadCloud, CheckCircle, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { useDashboardStore } from "@/store/dashboardStore";
 
 interface CsvUploaderProps {
   onUploadSuccess: () => void;
@@ -14,6 +15,7 @@ export function CsvUploader({ onUploadSuccess }: CsvUploaderProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const setStadiumState = useDashboardStore((state) => state.setStadiumState);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -36,6 +38,9 @@ export function CsvUploader({ onUploadSuccess }: CsvUploaderProps) {
         const errorData = await res.json();
         throw new Error(errorData.detail || "Upload failed");
       }
+
+      const updatedState = await res.json();
+      setStadiumState(updatedState);
 
       setStatus("success");
       onUploadSuccess(); // Trigger a refresh in the parent component

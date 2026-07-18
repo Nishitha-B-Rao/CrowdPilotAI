@@ -146,6 +146,8 @@ class AIService:
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
+                    temperature=0.0,
+                    max_output_tokens=128,
                 ),
             )
             text = response.text.strip()

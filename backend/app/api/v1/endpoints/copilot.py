@@ -44,7 +44,7 @@ async def get_recommendation(
         raise HTTPException(status_code=500, detail=f"Failed to generate recommendation: {str(e)}")
 
 @router.post("/translate", response_model=TranslateResponse)
-async def translate_text(
+def translate_text(
     request: TranslateRequest,
     ai_service: AIService = Depends(get_ai_service),
     telemetry_service: TelemetryService = Depends(get_telemetry_service)
@@ -56,6 +56,8 @@ async def translate_text(
     result = ai_service.translate_text(request.text)
     _log_ai_activity(telemetry_service, "Audio/Text Translation", start_time, result.get("confidence", "N/A"), "Translation Completed")
     return TranslateResponse(**result)
+
+import asyncio
 
 @router.post("/incidents/upload", response_model=IncidentResponse)
 async def upload_incidents(
@@ -74,7 +76,7 @@ async def upload_incidents(
     content = await file.read()
     csv_string = content.decode("utf-8")
     
-    result = ai_service.process_incidents(csv_string)
+    result = await asyncio.to_thread(ai_service.process_incidents, csv_string)
     
     # Calculate an average confidence if they don't have one globally for this
     _log_ai_activity(telemetry_service, "incident.csv Upload", start_time, "95%", f"Processed {len(result.get('incidents', []))} Incidents")
